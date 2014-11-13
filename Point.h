@@ -8,6 +8,8 @@ class Point{
 		double y;
 		double z;
 		Point(double x, double y, double z);
+		Point(double x, double y);
+		Point();
 };
 
 #endif

@@ -8,7 +8,8 @@ public:
 	double y;
 	double z;
 	Normal(double x, double y, double z);
-
+	Normal(double x, double y);
+	Normal();
 };
 
 #endif
