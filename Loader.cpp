@@ -221,14 +221,16 @@ int Loader::load() {
 			#ifdef DBG
 			cout << "Linha["<<lineCount<<"]: " << line << endl;
 			#endif
+			len = line.length();
+			if( !len ) continue;
+						
 			if(line[0]=='#' || line[0] == '/') {
 				#ifdef DBG	
 				cout << "** Comentario detected, first character: " << line[0] << endl;
 				#endif			
 				continue;
 			}
-			len = line.length();
-			if( !len ) continue;
+
 			if( len < 2 ) {
 				ERROR = LENGTH_ERROR;
 				goto LABEL_ERROR;
@@ -353,7 +355,7 @@ int Loader::load() {
 		
 	*/
 	if(ERROR) {
-		cout << "ERROR [TYPE:" << ERROR << "]" << endl;
+		cout << "ERROR [TYPE:" << ERROR << "] @ Line: " << lineCount << endl;
 	}
 	else {
 //		#ifdef DBG
