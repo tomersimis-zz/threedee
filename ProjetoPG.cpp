@@ -148,7 +148,7 @@ void display(){
 	glBegin(GL_TRIANGLES);
 
 	for(int i=0; i < faces.size(); i++){
-
+		glNormal3d(faces[i]->fn->x, faces[i]->fn->y, faces[i]->fn->z);
 		glVertex3d(faces[i]->v1->x, faces[i]->v1->y, faces[i]->v1->z);
 		glVertex3d(faces[i]->v2->x, faces[i]->v2->y, faces[i]->v2->z);
 		glVertex3d(faces[i]->v3->x, faces[i]->v3->y, faces[i]->v3->z);
@@ -178,6 +178,17 @@ void display(){
 
 }
 
+void setLightning(){
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	const GLfloat acolor[4] = { .7f, 0.0f, 0.3f, 0.0f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, acolor);
+	const GLfloat dcolor[4] = { 0.3f, 0.0f, 0.1f, 0.1f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dcolor);
+	const GLfloat scolor[4] = { 0.2f, 0.1f, 0.1f, 0.1f }; 
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, scolor );
+}
+
 void reshape(int w, int h){
 
 	#ifdef DEBUG
@@ -188,9 +199,8 @@ void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45, 1, 0.1, 500);
-	
+	setLightning();
 }
-
 
  void loadObj(std::string path){
 
@@ -264,10 +274,6 @@ void reshape(int w, int h){
 	int size = faces.size();
 	for (int i = 0; i < size; i++){
 		faceNormal(faces[i]->v1, faces[i]->v2, faces[i]->v3, faces[i]->fn);
-		//printf("v1: %f %f %f \n v2: %f %f %f \n v3: %f %f %f \n fn: %f %f %f", faces[i]->v1->x, faces[i]->v1->y, faces[i]->v1->z,
-		//	 faces[i]->v2->x, faces[i]->v2->y, faces[i]->v2->z, faces[i]->v3->x, faces[i]->v3->y, faces[i]->v3->z,
-		//	 faces[i]->fn->x, faces[i]->fn->y, faces[i]->fn->z);
-		//system("PAUSE");
 	 }
  }
 
