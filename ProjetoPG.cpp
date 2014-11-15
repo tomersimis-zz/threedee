@@ -145,21 +145,21 @@ void display(){
 	glMultMatrixd(scaleMatrix);
 
 
-	glBegin(GL_POINTS);
+	glBegin(GL_TRIANGLES);
 
-	/*for(int i=0; i < faces.size(); i++){
+	for(int i=0; i < faces.size(); i++){
 
 		glVertex3d(faces[i]->v1->x, faces[i]->v1->y, faces[i]->v1->z);
 		glVertex3d(faces[i]->v2->x, faces[i]->v2->y, faces[i]->v2->z);
 		glVertex3d(faces[i]->v3->x, faces[i]->v3->y, faces[i]->v3->z);
 
-	}*/
-
-	for(int i = 0; i < vertex.size(); i++){
-
-		glVertex3d(vertex[i]->x, vertex[i]->y, vertex[i]->z);
-
 	}
+
+	//for(int i = 0; i < vertex.size(); i++){
+
+	//	glVertex3d(vertex[i]->x, vertex[i]->y, vertex[i]->z);
+
+	//}
 
 	glEnd();
 
@@ -218,7 +218,7 @@ void reshape(int w, int h){
 				factor = std::max(factor, std::max(x, std::max(y, z)));
 				vertex.push_back(new Point(x,y,z));
 			}else if(c[0] == 'f'){
-				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1]));
+				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1], new Normal(0,0,0)));
 			}else if (c[0] == 's'){
 
 			}
@@ -236,6 +236,40 @@ void reshape(int w, int h){
 
 }
 
+ void faceNormal(Point *p1, Point *p2, Point *p3, Normal *normal){
+
+	 Point *v1 = new Point(0,0,0), *v2 = new Point(0,0,0);
+	 double len;
+
+	 v1->x = p2->x - p1->x;
+	 v1->y = p2->y - p1->y;
+	 v1->z = p2->z - p1->z;
+
+	 v2->x = p3->x - p1->x;
+	 v2->y = p3->y - p1->y;
+	 v2->z = p3->z - p1->z;
+
+	 /*cross product between v1 and v2*/
+	 normal->x = (v1->y * v2->z) - (v1->z * v2->y);
+	 normal->y = (v1->z * v2->x) - (v1->x * v2->z);
+	 normal->z = (v1->x * v2->y) - (v1->y * v2->x);
+
+	 len = sqrt(normal->x*normal->x + normal->y*normal->y + normal->z*normal->z);
+	 normal->x /= len;
+	 normal->y /= len;
+	 normal->z /= len;
+ }
+
+ void facesNormals(){
+	int size = faces.size();
+	for (int i = 0; i < size; i++){
+		faceNormal(faces[i]->v1, faces[i]->v2, faces[i]->v3, faces[i]->fn);
+		//printf("v1: %f %f %f \n v2: %f %f %f \n v3: %f %f %f \n fn: %f %f %f", faces[i]->v1->x, faces[i]->v1->y, faces[i]->v1->z,
+		//	 faces[i]->v2->x, faces[i]->v2->y, faces[i]->v2->z, faces[i]->v3->x, faces[i]->v3->y, faces[i]->v3->z,
+		//	 faces[i]->fn->x, faces[i]->fn->y, faces[i]->fn->z);
+		//system("PAUSE");
+	 }
+ }
 
 void keyboard(unsigned char key, int x, int y){
 
@@ -304,6 +338,8 @@ void mainMenu(int item){
 	else if (item == 1){
 		loadObj("Obj\\pumpkin.obj");
 	}
+
+	facesNormals();
 }
 
 void mousePress(int btn, int state, int x, int y){

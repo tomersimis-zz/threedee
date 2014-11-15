@@ -68,6 +68,12 @@ Face::Face(Point a, Point b, Point c, Normal d, Normal e, Normal f){
 
 }
 
+Face::Face(Point* v1, Point* v2, Point* v3, Normal* fn){
+	this->v1 = v1;
+	this->v2 = v2;
+	this->v3 = v3;
+	this->fn = fn;
+}
 
 /*
 g++ -o foo ProjetoPG.cpp -lglut -lGLU -lGL -lm
