@@ -42,7 +42,7 @@ bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
-GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+GLfloat light_position[] = { -1.0, -1.0, -1.0, 0.0 };
 
 void drawCoordinateSystem(){
 	glLineWidth(1.0);
@@ -63,7 +63,6 @@ void drawCoordinateSystem(){
 }
 
 void display(){
-
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -146,7 +145,6 @@ void display(){
 	};
 	glMultMatrixd(scaleMatrix);
 
-
 	glBegin(GL_TRIANGLES);
 
 	for(int i=0; i < faces.size(); i++){
@@ -182,16 +180,12 @@ void display(){
 
 void setLightning(){
 	glEnable(GL_LIGHTING);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glEnable(GL_LIGHT0);
-	const GLfloat acolor[4] = { .7f, 0.0f, 0.3f, .8f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, acolor);
-	const GLfloat dcolor[4] = { 0.3f, 0.0f, 0.1f, 0.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dcolor);
-	const GLfloat scolor[4] = { 1.f, 1.f, 1.0f, 0.0f }; 
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	const GLfloat scolor[4] = { .3, .3, .3, 0.0 };
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, scolor );
-	GLfloat mat_shininess[] = { 80.0 };
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	GLfloat mat_shininess[] = { 40.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
 }
 
 void reshape(int w, int h){
