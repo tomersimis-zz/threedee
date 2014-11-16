@@ -42,6 +42,8 @@ bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
+GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
+
 void drawCoordinateSystem(){
 	glLineWidth(1.0);
 	glColor3d(0.2, 0.64, 0.76);
@@ -180,13 +182,16 @@ void display(){
 
 void setLightning(){
 	glEnable(GL_LIGHTING);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glEnable(GL_LIGHT0);
-	const GLfloat acolor[4] = { .7f, 0.0f, 0.3f, 0.0f };
+	const GLfloat acolor[4] = { .7f, 0.0f, 0.3f, .8f };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, acolor);
-	const GLfloat dcolor[4] = { 0.3f, 0.0f, 0.1f, 0.1f };
+	const GLfloat dcolor[4] = { 0.3f, 0.0f, 0.1f, 0.0f };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dcolor);
-	const GLfloat scolor[4] = { 0.2f, 0.1f, 0.1f, 0.1f }; 
+	const GLfloat scolor[4] = { 1.f, 1.f, 1.0f, 0.0f }; 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, scolor );
+	GLfloat mat_shininess[] = { 80.0 };
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 }
 
 void reshape(int w, int h){
@@ -331,6 +336,48 @@ void keyboard(unsigned char key, int x, int y){
 		case '=':
 		case '+':
 			scale += 0.01;
+			break;
+		case 'u':
+		case 'U':
+			light_position[0] += 0.05;
+			if (light_position[0] > 1) light_position[0] = 1;
+			printf("%f\n", light_position[0]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'j':
+		case 'J':
+			light_position[0] -= 0.05;
+			if (light_position[0] < -1) light_position[0] = -1;
+			printf("%f\n", light_position[0]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'i':
+		case 'I':
+			light_position[1] += 0.05;
+			if (light_position[1] > 1) light_position[1] = 1;
+			printf("%f\n", light_position[1]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'k':
+		case 'K':
+			light_position[1] -= 0.05;
+			if (light_position[1] < -1) light_position[1] = -1;
+			printf("%f\n", light_position[1]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'o':
+		case 'O':
+			light_position[2] += 0.05;
+			if (light_position[2] > 1) light_position[2] = 1;
+			printf("%f\n", light_position[2]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'l':
+		case 'L':
+			light_position[2] -= 0.05;
+			if (light_position[2] < -1) light_position[2] = -1;
+			printf("%f\n", light_position[2]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 			break;
 
 	}
