@@ -7,8 +7,8 @@ public:
 	double x;
 	double y;
 	double z;
-	Normal(double x, double y, double z);
-	Normal(double x, double y);
+	Normal(double x = 0, double y = 0, double z = 0);
+	Normal(double x = 0, double y = 0);
 	Normal();
 };
 

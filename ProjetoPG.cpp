@@ -44,6 +44,8 @@ bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
+GLfloat light_position[] = { -1.0, -1.0, -1.0, 0.0 };
+
 void drawCoordinateSystem(){
 	glLineWidth(1.0);
 	glColor3d(0.2, 0.64, 0.76);
@@ -63,7 +65,6 @@ void drawCoordinateSystem(){
 }
 
 void display(){
-
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -150,22 +151,21 @@ void display(){
 	};
 	glMultMatrixd(scaleMatrix);
 
+	glBegin(GL_TRIANGLES);
 
-	glBegin(GL_POINTS);
-
-	/*for(int i=0; i < faces.size(); i++){
-
+	for(int i=0; i < faces.size(); i++){
+		glNormal3d(faces[i]->fn->x, faces[i]->fn->y, faces[i]->fn->z);
 		glVertex3d(faces[i]->v1->x, faces[i]->v1->y, faces[i]->v1->z);
 		glVertex3d(faces[i]->v2->x, faces[i]->v2->y, faces[i]->v2->z);
 		glVertex3d(faces[i]->v3->x, faces[i]->v3->y, faces[i]->v3->z);
 
-	}*/
-
-	for(int i = 0; i < vertex.size(); i++){
-
-		glVertex3d(vertex[i]->x, vertex[i]->y, vertex[i]->z);
-
 	}
+
+	//for(int i = 0; i < vertex.size(); i++){
+
+	//	glVertex3d(vertex[i]->x, vertex[i]->y, vertex[i]->z);
+
+	//}
 
 	glEnd();
 
@@ -189,6 +189,16 @@ void display(){
 
 }
 
+void setLightning(){
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	const GLfloat scolor[4] = { .3, .3, .3, 0.0 };
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, scolor );
+	GLfloat mat_shininess[] = { 40.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+}
+
 void reshape(int w, int h){
 
 	#ifdef DEBUG
@@ -199,9 +209,8 @@ void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45, 1, 0.1, 500);
-	
+	setLightning();
 }
-
 
  void loadObj(std::string path){
 
@@ -229,7 +238,7 @@ void reshape(int w, int h){
 				factor = std::max(factor, std::max(x, std::max(y, z)));
 				vertex.push_back(new Point(x,y,z));
 			}else if(c[0] == 'f'){
-				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1]));
+				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1], new Normal(0,0,0)));
 			}else if (c[0] == 's'){
 
 			}
@@ -247,6 +256,36 @@ void reshape(int w, int h){
 
 }
 
+ void faceNormal(Point *p1, Point *p2, Point *p3, Normal *normal){
+
+	 Point *v1 = new Point(0,0,0), *v2 = new Point(0,0,0);
+	 double len;
+
+	 v1->x = p2->x - p1->x;
+	 v1->y = p2->y - p1->y;
+	 v1->z = p2->z - p1->z;
+
+	 v2->x = p3->x - p1->x;
+	 v2->y = p3->y - p1->y;
+	 v2->z = p3->z - p1->z;
+
+	 /*cross product between v1 and v2*/
+	 normal->x = (v1->y * v2->z) - (v1->z * v2->y);
+	 normal->y = (v1->z * v2->x) - (v1->x * v2->z);
+	 normal->z = (v1->x * v2->y) - (v1->y * v2->x);
+
+	 len = sqrt(normal->x*normal->x + normal->y*normal->y + normal->z*normal->z);
+	 normal->x /= len;
+	 normal->y /= len;
+	 normal->z /= len;
+ }
+
+ void facesNormals(){
+	int size = faces.size();
+	for (int i = 0; i < size; i++){
+		faceNormal(faces[i]->v1, faces[i]->v2, faces[i]->v3, faces[i]->fn);
+	 }
+ }
 
 void keyboard(unsigned char key, int x, int y){
 
@@ -319,6 +358,48 @@ void keyboard(unsigned char key, int x, int y){
 		case '+':
 			scale += 0.01;
 			break;
+		case 'u':
+		case 'U':
+			light_position[0] += 0.05;
+			if (light_position[0] > 1) light_position[0] = 1;
+			printf("%f\n", light_position[0]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'j':
+		case 'J':
+			light_position[0] -= 0.05;
+			if (light_position[0] < -1) light_position[0] = -1;
+			printf("%f\n", light_position[0]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'i':
+		case 'I':
+			light_position[1] += 0.05;
+			if (light_position[1] > 1) light_position[1] = 1;
+			printf("%f\n", light_position[1]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'k':
+		case 'K':
+			light_position[1] -= 0.05;
+			if (light_position[1] < -1) light_position[1] = -1;
+			printf("%f\n", light_position[1]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'o':
+		case 'O':
+			light_position[2] += 0.05;
+			if (light_position[2] > 1) light_position[2] = 1;
+			printf("%f\n", light_position[2]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
+		case 'l':
+		case 'L':
+			light_position[2] -= 0.05;
+			if (light_position[2] < -1) light_position[2] = -1;
+			printf("%f\n", light_position[2]);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			break;
 
 	}
 
@@ -331,6 +412,8 @@ void mainMenu(int item){
 	else if (item == 1){
 		loadObj("Obj\\pumpkin.obj");
 	}
+
+	facesNormals();
 }
 
 void mousePress(int btn, int state, int x, int y){
