@@ -37,6 +37,8 @@ double factor;
 
 Point* lookAt;
 Point* camera;
+Vector forward;
+Vector side;
 
 bool drag;
 Point* mousePosition;
@@ -73,27 +75,31 @@ void display(){
 	glMatrixMode(GL_MODELVIEW);
 
 	/* View Matrix */
-	Vector forward = Vector(lookAt, camera);
+	forward = Vector(camera,lookAt);
 	forward.normalize();
 
-	Vector side = Vector::cross(forward, Vector(0, 1, 0));
-	side.normalize();
-
+	side = Vector::cross(forward, Vector(0, 1, 0));
+	
 	Vector up = Vector::cross(forward, side);
+	side.normalize();
 	up.normalize();
 
+		
 	double viewMatrix[16] = {
-		side.x, side.y, side.z, 0,
-		up.x, up.y, up.z, 0,
-		forward.x, forward.y, forward.z, 0,
-		-camera->x, -camera->y, -camera->z, 1,
+		side.x, up.x, -forward.x, 0,
+		side.y, up.y, -forward.y, 0,
+		side.z, up.z, -forward.z, 0,
+		0,0,0 , 1
 	};
 
+	
+
 	glPushMatrix();
-
 	glLoadIdentity();
-
+	
 	glMultMatrixd(viewMatrix);
+
+	glTranslated(-camera->x, -camera->y, -camera->z);
 
 	glTranslated(translateX, translateY, translateZ);
 
@@ -165,12 +171,17 @@ void display(){
 
 	glPopMatrix();
 
+	/* Coordinate system drawing */
 	glPushMatrix();
+
 	glLoadIdentity();
+
 	glMultMatrixd(viewMatrix);
-	//glTranslated(-camera->x, -camera->y, -camera->z);
+
 	drawCoordinateSystem();
+
 	glPopMatrix();
+
 
 	glutSwapBuffers();
 
@@ -270,19 +281,35 @@ void keyboard(unsigned char key, int x, int y){
 			break;
 		case 'w':
 		case 'W':
-			camera->z -= 0.1;
+			camera->z += forward.z / 10;
+			camera->x += forward.x / 10;
+			camera->y += forward.y / 10;
+
+			lookAt->z += forward.z / 10;
+			lookAt->x += forward.x / 10;
+			lookAt->y += forward.y / 10;
 			break;
 		case 's':
 		case 'S':
-			camera->z += 0.1;
+			camera->z -= forward.z / 10;
+			camera->x -= forward.x / 10;
+			camera->y -= forward.y / 10;
+
+			lookAt->z -= forward.z / 10;
+			lookAt->x -= forward.x / 10;
+			lookAt->y -= forward.y / 10;
 			break;
 		case 'd':
 		case 'D':
-			camera->x += 0.1;
+			camera->x += side.x/10;
+			camera->y += side.y/10;
+			camera->z += side.z/10;
 			break;
 		case 'a':
 		case 'A':
-			camera->x -= 0.1;
+			camera->x -= side.x / 10;
+			camera->y -= side.y / 10;
+			camera->z -= side.z / 10;
 			break;
 		case '-':
 		case '_':
@@ -319,8 +346,8 @@ void mousePress(int btn, int state, int x, int y){
 }
 
 void mouseMove(int x, int y){
-	lookAt->x += (x - mouseInitialPosition->x)*0.001;
-	lookAt->y += (y - mouseInitialPosition->y)*0.001;
+	lookAt->x += (x - mouseInitialPosition->x)*0.01;
+	lookAt->y += (y - mouseInitialPosition->y)*0.01;
 	mouseInitialPosition->x = x;
 	mouseInitialPosition->y = y;
 }

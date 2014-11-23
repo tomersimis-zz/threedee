@@ -4,5 +4,5 @@ C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.target
 c:\users\tomer simis\desktop\projetopg\projetopg\vector.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\tomer simis\desktop\projetopg\projetopg\projetopg.cpp(16): warning C4005: '_CRT_SECURE_NO_WARNINGS' : macro redefinition
           command-line arguments :  see previous definition of '_CRT_SECURE_NO_WARNINGS'
-c:\users\tomer simis\desktop\projetopg\projetopg\projetopg.cpp(158): warning C4018: '<' : signed/unsigned mismatch
+c:\users\tomer simis\desktop\projetopg\projetopg\projetopg.cpp(164): warning C4018: '<' : signed/unsigned mismatch
   ProjetoPG.vcxproj -> C:\Users\Tomer Simis\Desktop\ProjetoPG\ProjetoPG\.\Output\Debug\ProjetoPG.exe

@@ -2,6 +2,12 @@
 #include "Point.h";
 #include<cmath>;
 
+Vector::Vector(){
+	this->x = 0;
+	this->y = 0;
+	this->z = 0;
+}
+
 Vector::Vector(double x, double y, double z){
 	this->x = x;
 	this->y = y;
@@ -25,7 +31,20 @@ void Vector::normalize(){
 	this->z = this->z / length;
 }
 
+void Vector::add(Vector v){
+	this->x += v.x;
+	this->y += v.y;
+	this->z += v.z;
+}
+
+void Vector::subtract(Vector v){
+	this->x -= v.x;
+	this->y -= v.y;
+	this->z -= v.z;
+}
+
 // a × b = [a2b3 − a3b2, a3b1 − a1b3, a1b2 − a2b1]
 Vector Vector::cross(Vector v1, Vector v2){
 	return Vector(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x);
 }
+
