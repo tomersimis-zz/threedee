@@ -1,5 +1,5 @@
 #include "Face.h"
-
+#define EPS 1e-7
 Face::Face(Point* v1, Point* v2, Point* v3){
 	this->v1 = v1;
 	this->v2 = v2;
@@ -89,6 +89,7 @@ void Face::calculateNormal(){
 	double len;
 
 
+	//printf("\nDentro metodo face: %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", v1->x, v1->y, v1->z, v2->x, v2->y, v2->z, v3->x, v3->y, v3->z);
 	x1->x = v2->x - v1->x;
 	x1->y = v2->y - v1->y;
 	x1->z = v2->z - v1->z;
@@ -97,18 +98,27 @@ void Face::calculateNormal(){
 	x2->y = v3->y - v1->y;
 	x2->z = v3->z - v1->z;
 
-	/*cross product between v1 and v2*/
-	fn->x = (x1->y * x2->z) - (x1->z * x2->y);
-	fn->y = (x1->z * x2->x) - (x1->x * x2->z);
-	fn->z = (x1->x * x2->y) - (x1->y * x2->x);
-
-	len = sqrt(fn->x*fn->x + fn->y*fn->y + fn->z*fn->z);
-	fn->x /= len;
-	fn->y /= len;
-	fn->z /= len;
+	if ((fabs(x1->x) <= EPS && fabs(x1->y) <= EPS && fabs(x1->z) <= EPS) || (fabs(x2->x) <= EPS && fabs(x2->y) <= EPS && fabs(x2->z) <= EPS)){
+		
+	labelNulo:;
+		fn->x = 0;
+		fn->y = 0;
+		fn->z = 0;
 	
-}
+	}
+	else {
+		/*cross product between v1 and v2*/
+		fn->x = (x1->y * x2->z) - (x1->z * x2->y);
+		fn->y = (x1->z * x2->x) - (x1->x * x2->z);
+		fn->z = (x1->x * x2->y) - (x1->y * x2->x);
 
-/*
-g++ -o foo ProjetoPG.cpp -lglut -lGLU -lGL -lm
-*/
+		//printf("normal: %lf lf %lf\n", fn->x, fn->y, fn->z);
+
+		len = sqrt(fn->x*fn->x + fn->y*fn->y + fn->z*fn->z);
+
+		if (fabs(len) <= EPS) goto labelNulo;
+		fn->x /= len;
+		fn->y /= len;
+		fn->z /= len;
+	}
+}
