@@ -2,7 +2,7 @@
 #define __FACE_H_INCLUDED__
 
 #include "Point.h"
-#include "Normal.h"
+#include "Vector.h"
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -14,16 +14,17 @@ class Face{
 		Point* v1;
 		Point* v2;
 		Point* v3;
-		Normal* n1;
-		Normal* n2;
-		Normal* n3;
-		Normal* fn; //face normal
-		Face(Point* v1, Point* v2, Point* v3, Normal* n1, Normal* n2, Normal* n3);
+		Vector* n1;
+		Vector* n2;
+		Vector* n3;
+		Vector* fn; //face normal
+		Face(Point* v1, Point* v2, Point* v3, Vector* n1, Vector* n2, Vector* n3);
 		Face(Point* v1, Point* v2, Point* v3);
 		Face();
 		Face(Point a, Point b, Point c);
-		Face(Point a, Point b, Point c, Normal d, Normal e, Normal f);
-		Face(Point* v1, Point* v2, Point* v3, Normal *fn);
+		Face(Point a, Point b, Point c, Vector d, Vector e, Vector f);
+		Face(Point* v1, Point* v2, Point* v3, Vector *fn);
+		void calculateNormal();
 
 };
 #endif

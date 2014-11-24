@@ -12,6 +12,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include "Object.h"
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -19,21 +20,7 @@
 
 #define EPS 1e-9
 
-std::vector<Point*> vertex;
-std::vector<Face*> faces;
-std::vector<Normal*> normals;
-
-double rotationX;
-double rotationY;
-double rotationZ;
-
-double translateX = 0;
-double translateY = 0;
-double translateZ = 0;
-
-double scale = 1;
-
-double factor;
+std::vector<Object> objects;
 
 Point* lookAt;
 Point* camera;
@@ -44,7 +31,7 @@ bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
-GLfloat light_position[2][4] = { { -1.0, -1.0, -1.0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
+GLfloat light_position[2][4] = { { 0, 0, 0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
 int light = 0;
 bool enable = false;
 
@@ -104,18 +91,18 @@ void display(){
 
 	glTranslated(-camera->x, -camera->y, -camera->z);
 
-	glTranslated(translateX, translateY, translateZ);
+	//glTranslated(translateX, translateY, translateZ);
 
-	/* Rotate Z */
+	/* Rotate Z 
 	double rotateZMatrix[16] = {
 		cos(rotationZ), sin(rotationZ), 0, 0,
 	    -sin(rotationZ), cos(rotationZ),0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	};
-	glMultMatrixd(rotateZMatrix);
+	glMultMatrixd(rotateZMatrix);*/
 	
-	/* Rotate Y */
+	/* Rotate Y 
 	double rotateYMatrix[16] = {
 		cos(rotationY), 0, sin(rotationY), 0,
 		0, 1, 0, 0,
@@ -123,8 +110,8 @@ void display(){
 		0, 0, 0, 1
 	};
 	glMultMatrixd(rotateYMatrix);
-
-	/* Rotate X */
+	*/
+	/* Rotate X
 	double rotateXMatrix[16] = {
 		1, 0, 0, 0,
 		0, cos(rotationX), sin(rotationX), 0,
@@ -132,10 +119,10 @@ void display(){
 		0, 0, 0, 1
 	};
 	glMultMatrixd(rotateXMatrix);
+	*/
+	//glTranslated(-translateX, -translateY, -translateZ);
 
-	glTranslated(-translateX, -translateY, -translateZ);
-
-	/* Translation */
+	/* Translation
 	double translationMatrix[16] = {
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -143,8 +130,8 @@ void display(){
 		translateX, translateY, translateZ, 1
 	};
 	glMultMatrixd(translationMatrix);
-	
-	/* Scale */
+	 */
+	/* Scale 
 	double scaleMatrix[16] = {
 		scale, 0, 0, 0,
 		0, scale, 0, 0,
@@ -152,16 +139,19 @@ void display(){
 		0, 0, 0, 1
 	};
 	glMultMatrixd(scaleMatrix);
+	*/
 
 	glBegin(GL_TRIANGLES);
 
-	for(int i=0; i < faces.size(); i++){
-		glNormal3d(faces[i]->fn->x, faces[i]->fn->y, faces[i]->fn->z);
-		glVertex3d(faces[i]->v1->x, faces[i]->v1->y, faces[i]->v1->z);
-		glVertex3d(faces[i]->v2->x, faces[i]->v2->y, faces[i]->v2->z);
-		glVertex3d(faces[i]->v3->x, faces[i]->v3->y, faces[i]->v3->z);
-
+	for (int i = 0; i < objects.size(); i++){
+		for (int j = 0; j < objects[i].faces.size(); j++){
+			glNormal3d(objects[i].faces[j]->fn->x, objects[i].faces[j]->fn->y, objects[i].faces[j]->fn->z);
+			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
+			glVertex3d(objects[i].faces[j]->v2->x, objects[i].faces[j]->v2->y, objects[i].faces[j]->v2->z);
+			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
+		}
 	}
+	
 
 	//for(int i = 0; i < vertex.size(); i++){
 
@@ -229,14 +219,15 @@ void reshape(int w, int h){
 
  void loadObj(std::string path){
 
+	 std::vector<Point*> vertex;
+	 std::vector<Face*> faces;
+	 std::vector<Vector*> normals;
+
 	std::ifstream file;
 	file.open(path);
-
 	std::string line;
 
 	while (std::getline(file, line)){
-
-		printf("%s\n", line.c_str());
 
 		char c[2];
 
@@ -248,18 +239,22 @@ void reshape(int w, int h){
 			file >> x >> y >> z;
 
 			if (c[0] == 'v' && c[1] == 'n'){
-				normals.push_back(new Normal(x, y, z));
+				normals.push_back(new Vector(x, y, z));
 			}else if(c[0] == 'v'){
-				factor = std::max(factor, std::max(x, std::max(y, z)));
+				//factor = std::max(factor, std::max(x, std::max(y, z)));
 				vertex.push_back(new Point(x,y,z));
 			}else if(c[0] == 'f'){
-				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1], new Normal(0,0,0)));
+				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1], new Vector(0,0,0)));
 			}else if (c[0] == 's'){
 
 			}
 		}
 
 	}
+
+	Object newObject = Object(vertex, faces, normals);
+	newObject.calculateNormals();
+	objects.push_back(newObject);
 
 	file.close();
 
@@ -271,67 +266,36 @@ void reshape(int w, int h){
 
 }
 
- void faceNormal(Point *p1, Point *p2, Point *p3, Normal *normal){
-
-	 Point *v1 = new Point(0,0,0), *v2 = new Point(0,0,0);
-	 double len;
-
-	 v1->x = p2->x - p1->x;
-	 v1->y = p2->y - p1->y;
-	 v1->z = p2->z - p1->z;
-
-	 v2->x = p3->x - p1->x;
-	 v2->y = p3->y - p1->y;
-	 v2->z = p3->z - p1->z;
-
-	 /*cross product between v1 and v2*/
-	 normal->x = (v1->y * v2->z) - (v1->z * v2->y);
-	 normal->y = (v1->z * v2->x) - (v1->x * v2->z);
-	 normal->z = (v1->x * v2->y) - (v1->y * v2->x);
-
-	 len = sqrt(normal->x*normal->x + normal->y*normal->y + normal->z*normal->z);
-	 normal->x /= len;
-	 normal->y /= len;
-	 normal->z /= len;
- }
-
- void facesNormals(){
-	int size = faces.size();
-	for (int i = 0; i < size; i++){
-		faceNormal(faces[i]->v1, faces[i]->v2, faces[i]->v3, faces[i]->fn);
-	 }
- }
-
 void keyboard(unsigned char key, int x, int y){
 
 	switch (key){
 
 		case '1':
-			translateX -= 0.1;
+			//translateX -= 0.1;
 			break;
 		case '2':
-			translateX += 0.1;
+			//translateX += 0.1;
 			break;
 		case '3':
-			translateY -= 0.1;
+			//translateY -= 0.1;
 			break;
 		case '4':
-			translateY += 0.1;
+			//translateY += 0.1;
 			break;
 		case '5':
-			translateZ -= 0.1;
+			//translateZ -= 0.1;
 			break;
 		case '6':
-			translateZ += 0.1;
+			//translateZ += 0.1;
 			break;
 		case '7':
-			rotationX += 0.1;
+			//rotationX += 0.1;
 			break;
 		case '8':
-			rotationY += 0.1;
+			//rotationY += 0.1;
 			break;
 		case '9':
-			rotationZ += 0.1;
+			//rotationZ += 0.1;
 			break;
 		case 'w':
 		case 'W':
@@ -367,11 +331,11 @@ void keyboard(unsigned char key, int x, int y){
 			break;
 		case '-':
 		case '_':
-			scale-= 0.01;
+			//scale-= 0.01;
 			break;
 		case '=':
 		case '+':
-			scale += 0.01;
+			//scale += 0.01;
 			break;
 		case 'u':
 		case 'U':
@@ -465,8 +429,6 @@ void mainMenu(int item){
 	else if (item == 1){
 		loadObj("Obj\\pumpkin.obj");
 	}
-
-	facesNormals();
 }
 
 void mousePress(int btn, int state, int x, int y){
