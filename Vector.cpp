@@ -13,6 +13,12 @@ Vector::Vector(double x, double y, double z){
 	this->y = y;
 	this->z = z;
 }
+Vector::Vector(double x, double y){
+	this->x = x;
+	this->y = y;
+}
+
+
 
 Vector::Vector(Point* from, Point* to){
 	this->x = to->x - from->x;

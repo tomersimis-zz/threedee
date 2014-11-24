@@ -13,23 +13,36 @@
 #include <fstream>
 #include <algorithm>
 #include "Object.h"
+#include "Loader.h"
 
 #define _CRT_SECURE_NO_WARNINGS
+
+#define DRAW_NORMAL
 
 #define DEBUG
 
 #define EPS 1e-9
 
+
 std::vector<Object> objects;
 
 Point* lookAt;
 Point* camera;
-Vector forward;
+Vector cameraForward;
 Vector side;
+
+vector<vector<Point>> MEM_VEC_POINTS;
+vector<vector<Vector>> MEM_VEC_VECTOR;
+vector<vector<Face>> MEM_VEC_FACES;
+
+
+
 
 bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
+
+
 
 GLfloat light_position[2][4] = { { 0, 0, 0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
 int light = 0;
@@ -118,20 +131,20 @@ void display(){
 	glMatrixMode(GL_MODELVIEW);
 
 	/* View Matrix */
-	forward = Vector(camera,lookAt);
-	forward.normalize();
+	cameraForward = Vector(camera,lookAt);
+	cameraForward.normalize();
 
-	side = Vector::cross(forward, Vector(0, 1, 0));
+	side = Vector::cross(cameraForward, Vector(0, 1, 0));
 	
-	Vector up = Vector::cross(forward, side);
+	Vector up = Vector::cross(cameraForward, side);
 	side.normalize();
 	up.normalize();
 
 		
 	double viewMatrix[16] = {
-		side.x, up.x, -forward.x, 0,
-		side.y, up.y, -forward.y, 0,
-		side.z, up.z, -forward.z, 0,
+		side.x, up.x, -cameraForward.x, 0,
+		side.y, up.y, -cameraForward.y, 0,
+		side.z, up.z, -cameraForward.z, 0,
 		0,0,0 , 1
 	};
 
@@ -159,7 +172,11 @@ void display(){
 		glBegin(GL_TRIANGLES);
 		
 		for (int j = 0; j < objects[i].faces.size(); j++){
+			//printf("\nChegou 2\n");
+#ifdef DRAW_NORMAL
 			glNormal3d(objects[i].faces[j]->fn->x, objects[i].faces[j]->fn->y, objects[i].faces[j]->fn->z);
+#endif
+			//printf("Chegou 1\n");
 			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
 			glVertex3d(objects[i].faces[j]->v2->x, objects[i].faces[j]->v2->y, objects[i].faces[j]->v2->z);
 			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
@@ -303,23 +320,23 @@ void keyboard(unsigned char key, int x, int y){
 			break;
 		case 'w':
 		case 'W':
-			camera->z += forward.z / 1;
-			camera->x += forward.x / 1;
-			camera->y += forward.y / 1;
+			camera->z += cameraForward.z / 1;
+			camera->x += cameraForward.x / 1;
+			camera->y += cameraForward.y / 1;
 
-			lookAt->z += forward.z / 1;
-			lookAt->x += forward.x / 1;
-			lookAt->y += forward.y / 1;
+			lookAt->z += cameraForward.z / 1;
+			lookAt->x += cameraForward.x / 1;
+			lookAt->y += cameraForward.y / 1;
 			break;
 		case 's':
 		case 'S':
-			camera->z -= forward.z / 1;
-			camera->x -= forward.x / 1;
-			camera->y -= forward.y / 1;
+			camera->z -= cameraForward.z / 1;
+			camera->x -= cameraForward.x / 1;
+			camera->y -= cameraForward.y / 1;
 
-			lookAt->z -= forward.z / 1;
-			lookAt->x -= forward.x / 1;
-			lookAt->y -= forward.y / 1;
+			lookAt->z -= cameraForward.z / 1;
+			lookAt->x -= cameraForward.x / 1;
+			lookAt->y -= cameraForward.y / 1;
 			break;
 		case 'd':
 		case 'D':
@@ -437,33 +454,73 @@ void keyboard(unsigned char key, int x, int y){
 
 void mainMenu(int item){
 
+	std::vector<Point*> vertex;
+	std::vector<Face*> faces;
+	std::vector<Vector*> normals;
+	string s="";
 	if (item == 0){
-		loadObj("Obj\\cubo1.obj");
+		//Loader("Obj\\cubo1.obj", vertex, normals, faces);
+	
 	}
 	else if (item == 1){
-		loadObj("Obj\\pumpkin.obj");
+		s = "Obj\\pumpkin.obj";
 	}
+	
 	else if (item == 2){
-		loadObj("Obj\\apple.obj");
+		s = "Obj\\apple.obj";
 	}
 	else if (item == 3){
-		loadObj("Obj\\chimp.obj");
+		s = "Obj\\chimp.obj";
 	}
 	else if (item == 4){
-		loadObj("Obj\\cow.obj");
+		s = "Obj\\cow.obj";
 	}
 	else if (item == 5){
-		loadObj("Obj\\dog.obj");
+		s = "Obj\\dog.obj";
+
 	}
 	else if (item == 6){
-		loadObj("Obj\\eagle.obj");
+		s = "Obj\\eagle.obj";
 	}
 	else if (item == 7){
-		loadObj("Obj\\elephant.obj");
+		s = "Obj\\elephant.obj";
 	}
 	else if (item == 8){
-		loadObj("Obj\\lion.obj");
+		s = "Obj\\lion.obj";
 	}
+	if (s.empty()) return;
+	vector<Point> CONST_P;
+	vector<Vector> CONST_vec;
+	vector<Face> CONST_f;
+	MEM_VEC_POINTS.push_back(CONST_P);
+	MEM_VEC_VECTOR.push_back(CONST_vec);
+	MEM_VEC_FACES.push_back(CONST_f);
+
+	//Loader l = Loader(&s, &CONST_P, &CONST_vec, &CONST_f);
+	Loader l = Loader(&s, &MEM_VEC_POINTS[MEM_VEC_POINTS.size() - 1], &MEM_VEC_VECTOR[MEM_VEC_VECTOR.size() - 1], &MEM_VEC_FACES[MEM_VEC_FACES.size()-1]);
+	l.load();
+	for (int i = 0; i < MEM_VEC_POINTS[MEM_VEC_POINTS.size() - 1].size(); i++){
+		vertex.push_back(&MEM_VEC_POINTS[MEM_VEC_POINTS.size() - 1][i]);
+	}
+
+	for (int i = 0; i <MEM_VEC_VECTOR[MEM_VEC_VECTOR.size() - 1].size(); i++){
+		normals.push_back(&MEM_VEC_VECTOR[MEM_VEC_VECTOR.size() - 1][i]);
+	}
+
+	for (int i = 0; i < MEM_VEC_FACES[MEM_VEC_FACES.size() - 1].size(); i++){
+		faces.push_back(&MEM_VEC_FACES[MEM_VEC_FACES.size() - 1][i]);
+	}
+
+
+
+
+	printf("Criando o novo objeto . . ./n");
+	Object newObject = Object(vertex, faces, normals);
+	newObject.calculateNormals();
+	printf("Calculando as normais . . ./n");
+	objects.push_back(newObject);
+	printf("Inserindo o objeto . . ./n");
+	printf(" READY! \n");
 }
 
 void mousePress(int btn, int state, int x, int y){
@@ -487,6 +544,14 @@ void mouseMove(int x, int y){
 
 int main(int argc, char** argv)
 {
+
+	
+
+
+
+//	int k;
+//	printf("pausa");
+//	scanf("%d",&k);
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(800, 600);

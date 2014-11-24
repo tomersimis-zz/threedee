@@ -1,7 +1,7 @@
 #ifndef __VECTOR_H_INCLUDED__
 #define __VECTOR_H_INCLUDED__
 
-#include "Point.h";
+#include "Point.h"
 
 class Vector{
 
@@ -10,6 +10,7 @@ class Vector{
 		double y;
 		double z;
 		Vector(double x, double y, double z);
+		Vector(double x, double y);
 		Vector(Point* from, Point* to);
 		Vector();
 		double getLength();
