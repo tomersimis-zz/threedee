@@ -20,6 +20,10 @@ class Vector{
 		static Vector cross(Vector v1, Vector v2);
 		long long int dotProduct(Vector v);
 		void multitplyScalar(int k);
+		double norm();
+		double angleBetween(Vector v);
+
+
 };
 
 #endif

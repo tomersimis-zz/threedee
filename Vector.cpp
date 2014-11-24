@@ -1,7 +1,8 @@
 ﻿#include "Vector.h";
 #include "Point.h";
 #include<cmath>;
-
+#include <cstdio>
+#define EPS 1e-7
 Vector::Vector(){
 	this->x = 0;
 	this->y = 0;
@@ -59,9 +60,23 @@ long long int Vector::dotProduct(Vector v){
 }
 
 void Vector::multitplyScalar(int k){
-
 	this->x *= k;
 	this->y *= k;
 	this->z *= k;
+}
+
+double  Vector::norm(){
+	return sqrt( (this->x*this->x) + (this->y*this->y) + (this->z * this->z)  );
+}
+
+double  Vector::angleBetween(Vector v){
+	double normProd = this->norm()  * v.norm();
+	//printf("%lf %lf %lf --> norm: %lf  || his norm: %lf\n", this->x, this->y, this->z, this->norm(), v.norm() );
+//	printf("");
+	if (fabs(normProd) < EPS) normProd = 10 * EPS;
+
+	double docProd = this->dotProduct(v);
+	
+	return acos(  docProd/normProd  );
 
 }

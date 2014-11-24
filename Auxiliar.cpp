@@ -3,7 +3,13 @@
 #include "Face.h"
 #include "Auxiliar.h"
 #include <cmath>;
+#define EPS 1e-7
 
+bool cmpDouble(double a, double b){
+	if (fabs(a - b) <= EPS) return 0;
+	return (a > b) ? 1 : -1;
+
+}
 
 //ainda não testei mas foi o algoritmo do site que eu transcrevi
 //TESTAR
@@ -34,10 +40,33 @@ Auxiliar::Auxiliar(){
 
 }
 
-bool pointIn(Point point, Face face){
+bool Auxiliar::pointIn(Point point, Face face){
 
+	Point projected = this->project_point(face, point);
+	Vector a, b;
+	double angle = 0.0;
+	a = Vector(&projected, face.v1);
+	b = Vector(&projected, face.v2);
+	
+	angle += a.angleBetween(b); // v1_v2
 
-	return 0;
+	printf("1 Angle: %lf \n", a.angleBetween(b));
+
+	b = Vector(&projected, face.v3);
+
+	angle += a.angleBetween(b); // v1_v3
+
+	printf("2 Angle: %lf \n", a.angleBetween(b));
+
+	a = Vector(&projected, face.v3);
+	 
+	angle += a.angleBetween(b); // v2_v3
+
+	printf("3 Angle: %lf \n", a.angleBetween(b));
+	printf("Angle total: %lf\n", angle);
+
+	return cmpDouble(angle, acos(-1)) == 0;
+
 }
 
 /*
