@@ -18,6 +18,8 @@ class Vector{
 		void add(Vector v);
 		void subtract(Vector v);
 		static Vector cross(Vector v1, Vector v2);
+		long long int dotProduct(Vector v);
+		void multitplyScalar(int k);
 };
 
 #endif
