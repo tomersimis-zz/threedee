@@ -35,6 +35,8 @@ GLfloat light_position[2][4] = { { 0, 0, 0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
 int light = 0;
 bool enable = false;
 
+int selectedObject = 0;
+
 void drawCoordinateSystem(){
 	glLineWidth(1.0);
 	glColor3d(0.2, 0.64, 0.76);
@@ -52,6 +54,57 @@ void drawCoordinateSystem(){
 
 	glEnd();
 }
+
+void translate(double x, double y, double z){
+	double translationMatrix[16] = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		x, y, z, 1
+	};
+	glMultMatrixd(translationMatrix);
+}
+
+void scale(double scale){
+	double scaleMatrix[16] = {
+		scale, 0, 0, 0,
+		0, scale, 0, 0,
+		0, 0, scale, 0,
+		0, 0, 0, 1
+	};
+	glMultMatrixd(scaleMatrix);
+}
+
+void rotateZ(double angle){
+	double rotateZMatrix[16] = {
+		cos(angle), sin(angle), 0, 0,
+		-sin(angle), cos(angle), 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+	glMultMatrixd(rotateZMatrix);
+}
+
+void rotateY(double angle){
+	double rotateYMatrix[16] = {
+		cos(angle), 0, sin(angle), 0,
+		0, 1, 0, 0,
+		-sin(angle), 0, cos(angle), 0,
+		0, 0, 0, 1
+	};
+	glMultMatrixd(rotateYMatrix);
+}
+
+void rotateX(double angle){
+	double rotateXMatrix[16] = {
+		1, 0, 0, 0,
+		0, cos(angle), sin(angle), 0,
+		0, -sin(angle), cos(angle), 0,
+		0, 0, 0, 1
+	};
+	glMultMatrixd(rotateXMatrix);
+}
+
 
 void display(){
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -84,96 +137,47 @@ void display(){
 
 	
 
-	glPushMatrix();
 	glLoadIdentity();
 	
 	glMultMatrixd(viewMatrix);
 
 	glTranslated(-camera->x, -camera->y, -camera->z);
 
-	//glTranslated(translateX, translateY, translateZ);
-
-	/* Rotate Z 
-	double rotateZMatrix[16] = {
-		cos(rotationZ), sin(rotationZ), 0, 0,
-	    -sin(rotationZ), cos(rotationZ),0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(rotateZMatrix);*/
-	
-	/* Rotate Y 
-	double rotateYMatrix[16] = {
-		cos(rotationY), 0, sin(rotationY), 0,
-		0, 1, 0, 0,
-		-sin(rotationY), 0, cos(rotationY), 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(rotateYMatrix);
-	*/
-	/* Rotate X
-	double rotateXMatrix[16] = {
-		1, 0, 0, 0,
-		0, cos(rotationX), sin(rotationX), 0,
-		0, -sin(rotationX), cos(rotationX), 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(rotateXMatrix);
-	*/
-	//glTranslated(-translateX, -translateY, -translateZ);
-
-	/* Translation
-	double translationMatrix[16] = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		translateX, translateY, translateZ, 1
-	};
-	glMultMatrixd(translationMatrix);
-	 */
-	/* Scale 
-	double scaleMatrix[16] = {
-		scale, 0, 0, 0,
-		0, scale, 0, 0,
-		0, 0, scale, 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(scaleMatrix);
-	*/
-
-	glBegin(GL_TRIANGLES);
 
 	for (int i = 0; i < objects.size(); i++){
+		glPushMatrix();
+
+		translate(objects[i].translationX, objects[i].translationY, objects[i].translationZ);
+
+		rotateX(objects[i].rotationX);
+		rotateY(objects[i].rotationY);
+		rotateZ(objects[i].rotationZ);
+
+
+		scale(objects[i].scale);
+		
+		glBegin(GL_TRIANGLES);
+		
 		for (int j = 0; j < objects[i].faces.size(); j++){
 			glNormal3d(objects[i].faces[j]->fn->x, objects[i].faces[j]->fn->y, objects[i].faces[j]->fn->z);
 			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
 			glVertex3d(objects[i].faces[j]->v2->x, objects[i].faces[j]->v2->y, objects[i].faces[j]->v2->z);
 			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
 		}
+		glEnd();
+
+		glPopMatrix();
+
 	}
+
 	
-
-	//for(int i = 0; i < vertex.size(); i++){
-
-	//	glVertex3d(vertex[i]->x, vertex[i]->y, vertex[i]->z);
-
-	//}
-
-	glEnd();
-
-	glPopMatrix();
 
 	/* Coordinate system drawing */
 	glPushMatrix();
 
-	glLoadIdentity();
-
-	glMultMatrixd(viewMatrix);
-
 	drawCoordinateSystem();
 
 	glPopMatrix();
-
 
 	glutSwapBuffers();
 
@@ -271,51 +275,51 @@ void keyboard(unsigned char key, int x, int y){
 	switch (key){
 
 		case '1':
-			//translateX -= 0.1;
+			objects[selectedObject].translationX -= 0.1;
 			break;
 		case '2':
-			//translateX += 0.1;
+			objects[selectedObject].translationX += 0.1;
 			break;
 		case '3':
-			//translateY -= 0.1;
+			objects[selectedObject].translationY -= 0.1;
 			break;
 		case '4':
-			//translateY += 0.1;
+			objects[selectedObject].translationY += 0.1;
 			break;
 		case '5':
-			//translateZ -= 0.1;
+			objects[selectedObject].translationZ -= 0.1;
 			break;
 		case '6':
-			//translateZ += 0.1;
+			objects[selectedObject].translationY += 0.1;
 			break;
 		case '7':
-			//rotationX += 0.1;
+			objects[selectedObject].rotationX += 0.1;
 			break;
 		case '8':
-			//rotationY += 0.1;
+			objects[selectedObject].rotationY += 0.1;
 			break;
 		case '9':
-			//rotationZ += 0.1;
+			objects[selectedObject].rotationZ += 0.1;
 			break;
 		case 'w':
 		case 'W':
-			camera->z += forward.z / 10;
-			camera->x += forward.x / 10;
-			camera->y += forward.y / 10;
+			camera->z += forward.z / 1;
+			camera->x += forward.x / 1;
+			camera->y += forward.y / 1;
 
-			lookAt->z += forward.z / 10;
-			lookAt->x += forward.x / 10;
-			lookAt->y += forward.y / 10;
+			lookAt->z += forward.z / 1;
+			lookAt->x += forward.x / 1;
+			lookAt->y += forward.y / 1;
 			break;
 		case 's':
 		case 'S':
-			camera->z -= forward.z / 10;
-			camera->x -= forward.x / 10;
-			camera->y -= forward.y / 10;
+			camera->z -= forward.z / 1;
+			camera->x -= forward.x / 1;
+			camera->y -= forward.y / 1;
 
-			lookAt->z -= forward.z / 10;
-			lookAt->x -= forward.x / 10;
-			lookAt->y -= forward.y / 10;
+			lookAt->z -= forward.z / 1;
+			lookAt->x -= forward.x / 1;
+			lookAt->y -= forward.y / 1;
 			break;
 		case 'd':
 		case 'D':
@@ -331,11 +335,11 @@ void keyboard(unsigned char key, int x, int y){
 			break;
 		case '-':
 		case '_':
-			//scale-= 0.01;
+			objects[selectedObject].scale -= 0.1;
 			break;
 		case '=':
 		case '+':
-			//scale += 0.01;
+			objects[selectedObject].scale += 0.1;
 			break;
 		case 'u':
 		case 'U':
@@ -418,16 +422,47 @@ void keyboard(unsigned char key, int x, int y){
 				glEnable(GL_LIGHTING);
 			}
 			break;
+		case '.':
+		case '>':
+			selectedObject = (selectedObject + 1) % objects.size();
+			break;
+		case ',':
+		case '<':
+			selectedObject -= 1;
+			if (selectedObject == -1) selectedObject = objects.size()-1;
+			break;
 	}
 
 }
 
 void mainMenu(int item){
+
 	if (item == 0){
-		loadObj("Obj\\cube.obj");
+		loadObj("Obj\\cubo1.obj");
 	}
 	else if (item == 1){
 		loadObj("Obj\\pumpkin.obj");
+	}
+	else if (item == 2){
+		loadObj("Obj\\apple.obj");
+	}
+	else if (item == 3){
+		loadObj("Obj\\chimp.obj");
+	}
+	else if (item == 4){
+		loadObj("Obj\\cow.obj");
+	}
+	else if (item == 5){
+		loadObj("Obj\\dog.obj");
+	}
+	else if (item == 6){
+		loadObj("Obj\\eagle.obj");
+	}
+	else if (item == 7){
+		loadObj("Obj\\elephant.obj");
+	}
+	else if (item == 8){
+		loadObj("Obj\\lion.obj");
 	}
 }
 
@@ -461,6 +496,13 @@ int main(int argc, char** argv)
 
 	glutAddMenuEntry("Cube", 0);
 	glutAddMenuEntry("Pumpkin", 1);
+	glutAddMenuEntry("Apple", 2);
+	glutAddMenuEntry("Chimp", 3);
+	glutAddMenuEntry("Cow", 4);
+	glutAddMenuEntry("Dog", 5);
+	glutAddMenuEntry("Eagle", 6);
+	glutAddMenuEntry("Elephant", 7);
+	glutAddMenuEntry("Lion", 8);
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
