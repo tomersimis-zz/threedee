@@ -38,10 +38,22 @@ void Vector::normalize(){
 	this->z = this->z / length;
 }
 
+void Vector::add(Vector* v){
+	this->x += v->x;
+	this->y += v->y;
+	this->z += v->z;
+}
+
 void Vector::add(Vector v){
 	this->x += v.x;
 	this->y += v.y;
 	this->z += v.z;
+}
+
+void Vector::add(Point *v){
+	this->x += v->x;
+	this->y += v->y;
+	this->z += v->z;
 }
 
 void Vector::subtract(Vector v){

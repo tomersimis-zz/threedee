@@ -35,18 +35,15 @@ vector<vector<Point>> MEM_VEC_POINTS;
 vector<vector<Vector>> MEM_VEC_VECTOR;
 vector<vector<Face>> MEM_VEC_FACES;
 
-
-
-
 bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
-
-
 GLfloat light_position[2][4] = { { 0, 0, 0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
 int light = 0;
 bool enable = false;
+
+float near = 0.1;
 
 int selectedObject = 0;
 
@@ -162,10 +159,10 @@ void display(){
 
 		translate(objects[i].translationX, objects[i].translationY, objects[i].translationZ);
 
+		
 		rotateX(objects[i].rotationX);
-		rotateY(objects[i].rotationY);
+		rotateY(objects[i].rotationY);	
 		rotateZ(objects[i].rotationZ);
-
 
 		scale(objects[i].scale);
 		
@@ -234,7 +231,8 @@ void reshape(int w, int h){
 	glViewport(0,0,w,h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45, 1, 0.1, 500);
+	glFrustum(-0.041421, 0.041421, -0.041421, 0.041421,near, 500);
+
 	setLightning();
 }
 
@@ -247,6 +245,8 @@ void reshape(int w, int h){
 	std::ifstream file;
 	file.open(path);
 	std::string line;
+
+	int index = 0;
 
 	while (std::getline(file, line)){
 
@@ -263,7 +263,8 @@ void reshape(int w, int h){
 				normals.push_back(new Vector(x, y, z));
 			}else if(c[0] == 'v'){
 				//factor = std::max(factor, std::max(x, std::max(y, z)));
-				vertex.push_back(new Point(x,y,z));
+				vertex.push_back(new Point(x,y,z,index));
+				index++;
 			}else if(c[0] == 'f'){
 				faces.push_back(new Face(vertex[x - 1], vertex[y - 1], vertex[z - 1], new Vector(0,0,0)));
 			}else if (c[0] == 's'){
@@ -275,6 +276,7 @@ void reshape(int w, int h){
 
 	Object newObject = Object(vertex, faces, normals);
 	newObject.calculateNormals();
+	newObject.calculateVertexNormals();
 	objects.push_back(newObject);
 
 	file.close();
@@ -287,27 +289,103 @@ void reshape(int w, int h){
 
 }
 
+char mode = 0; // 0 = obj, 1 = light
 void keyboard(unsigned char key, int x, int y){
 
 	switch (key){
 
 		case '1':
-			objects[selectedObject].translationX -= 0.1;
+			if (mode == 0){
+				objects[selectedObject].translationX -= 0.1;
+			}else{
+				light_position[light][0] += 0.05;
+				if (light_position[light][0] > 1) light_position[light][0] = 1;
+				if (light == 0){
+					glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+				}
+				else{
+					glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+				}
+			}
 			break;
 		case '2':
-			objects[selectedObject].translationX += 0.1;
+			if (mode == 0){
+				objects[selectedObject].translationX += 0.1;
+			}
+			else{
+				light_position[light][0] -= 0.05;
+				if (light_position[light][0] < -1) light_position[light][0] = -1;
+				if (light == 0){
+					glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+				}
+				else{
+					glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+				}
+			}
+			
 			break;
 		case '3':
-			objects[selectedObject].translationY -= 0.1;
+			if (mode == 0){
+				objects[selectedObject].translationY -= 0.1;
+			}
+			else{
+				light_position[light][1] += 0.05;
+				if (light_position[light][1] > 1) light_position[light][1] = 1;
+				if (light == 0){
+					glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+				}
+				else{
+					glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+				}
+			}
+			
 			break;
 		case '4':
-			objects[selectedObject].translationY += 0.1;
+			if (mode == 0){
+				objects[selectedObject].translationY += 0.1;
+			}
+			else{
+				light_position[light][1] -= 0.05;
+				if (light_position[light][1] < -1) light_position[light][1] = -1;
+				if (light == 0){
+					glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+				}
+				else{
+					glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+				}
+			}			
 			break;
 		case '5':
-			objects[selectedObject].translationZ -= 0.1;
+			if (mode == 0){
+				objects[selectedObject].translationZ -= 0.1;
+			}
+			else{
+				light_position[light][2] += 0.05;
+				if (light_position[light][2] > 1) light_position[light][2] = 1;
+				if (light == 0){
+					glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+				}
+				else{
+					glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+				}
+			}
+			
 			break;
 		case '6':
-			objects[selectedObject].translationY += 0.1;
+			if (mode == 0){
+				objects[selectedObject].translationY += 0.1;
+			}
+			else{
+				light_position[light][2] -= 0.05;
+				if (light_position[light][2] < -1) light_position[light][2] = -1;
+				if (light == 0){
+					glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+				}
+				else{
+					glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+				}
+			}
+			
 			break;
 		case '7':
 			objects[selectedObject].rotationX += 0.1;
@@ -358,73 +436,6 @@ void keyboard(unsigned char key, int x, int y){
 		case '+':
 			objects[selectedObject].scale += 0.1;
 			break;
-		case 'u':
-		case 'U':
-			printf("%d",light);
-			light_position[light][0] += 0.05;
-			if (light_position[light][0] > 1) light_position[light][0] = 1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}			
-			break;
-		case 'j':
-		case 'J':
-			light_position[light][0] -= 0.05;
-			if (light_position[light][0] < -1) light_position[light][0] = -1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}
-			break;
-		case 'i':
-		case 'I':
-			light_position[light][1] += 0.05;
-			if (light_position[light][1] > 1) light_position[light][1] = 1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}
-			break;
-		case 'k':
-		case 'K':
-			light_position[light][1] -= 0.05;
-			if (light_position[light][1] < -1) light_position[light][1] = -1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}
-			break;
-		case 'o':
-		case 'O':
-			light_position[light][2] += 0.05;
-			if (light_position[light][2] > 1) light_position[light][2] = 1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}
-			break;
-		case 'l':
-		case 'L':
-			light_position[light][2] -= 0.05;
-			if (light_position[light][2] < -1) light_position[light][2] = -1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}
-			break;
 		case 'n':
 		case 'N':
 			light = (light + 1) % 2;
@@ -448,6 +459,44 @@ void keyboard(unsigned char key, int x, int y){
 			selectedObject -= 1;
 			if (selectedObject == -1) selectedObject = objects.size()-1;
 			break;
+		case 'b':
+		case 'B':
+			mode = (mode + 1) % 2;
+			break;
+		case 'z':
+		case 'Z':
+			camera->z += cameraForward.z / 3;
+			camera->x += cameraForward.x / 3;
+			camera->y += cameraForward.y / 3;
+
+			lookAt->z += cameraForward.z / 3;
+			lookAt->x += cameraForward.x / 3;
+			lookAt->y += cameraForward.y / 3;
+
+			near -= 0.0026;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
+			break;
+		case 'x':
+		case 'X':
+			camera->z -= cameraForward.z / 3;
+			camera->x -= cameraForward.x / 3;
+			camera->y -= cameraForward.y / 3;
+
+			lookAt->z -= cameraForward.z / 3;
+			lookAt->x -= cameraForward.x / 3;
+			lookAt->y -= cameraForward.y / 3;
+
+			near += 0.0026;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
+			break;
+			break;
+
 	}
 
 }
@@ -544,32 +593,13 @@ void mouseMove(int x, int y){
 
 int main(int argc, char** argv)
 {
-
-	
-
-
-
-//	int k;
-//	printf("pausa");
-//	scanf("%d",&k);
-
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(800, 600);
+	
+	mainMenu(1);
+	mainMenu(4);
+
 	glutCreateWindow("Hello World");
-
-	glutCreateMenu( mainMenu );
-
-	glutAddMenuEntry("Cube", 0);
-	glutAddMenuEntry("Pumpkin", 1);
-	glutAddMenuEntry("Apple", 2);
-	glutAddMenuEntry("Chimp", 3);
-	glutAddMenuEntry("Cow", 4);
-	glutAddMenuEntry("Dog", 5);
-	glutAddMenuEntry("Eagle", 6);
-	glutAddMenuEntry("Elephant", 7);
-	glutAddMenuEntry("Lion", 8);
-
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
+	glutFullScreen();
 
 	glutDisplayFunc(display);
 
