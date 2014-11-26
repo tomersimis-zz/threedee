@@ -87,6 +87,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Face.h" />
     <ClInclude Include="Loader.h" />
     <ClInclude Include="Object.h" />
@@ -95,6 +96,7 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Face.cpp" />
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="Object.cpp" />
