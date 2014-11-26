@@ -19,6 +19,11 @@ Vector::Vector(double x, double y){
 	this->y = y;
 }
 
+Vector::Vector(Point from, Point to){
+	this->x = to.x - from.x;
+	this->y = to.y - from.y;
+	this->z = to.z - from.z;
+}
 
 
 Vector::Vector(Point* from, Point* to){
@@ -91,4 +96,8 @@ double  Vector::angleBetween(Vector v){
 	
 	return acos(  docProd/normProd  );
 
+}
+
+double Vector::dot(Vector v){
+	return this->x*v.x + this->y*v.y + this->z*v.z;
 }

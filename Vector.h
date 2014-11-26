@@ -12,6 +12,7 @@ class Vector{
 		Vector(double x, double y, double z);
 		Vector(double x, double y);
 		Vector(Point* from, Point* to);
+		Vector(Point from, Point to);
 		Vector();
 		double getLength();
 		void normalize();
@@ -24,6 +25,7 @@ class Vector{
 		void multitplyScalar(int k);
 		double norm();
 		double angleBetween(Vector v);
+		double dot(Vector v);
 
 
 };
