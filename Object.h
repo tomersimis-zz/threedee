@@ -22,6 +22,7 @@ class Object{
 		Object(std::vector<Point*> vertex, std::vector<Face*> faces, std::vector<Vector*> normals);
 		void calculateNormals();
 		void calculateNormal();
+		void calculateVertexNormals();
 
 };
 
