@@ -113,6 +113,29 @@ void rotateX(double angle){
 	glMultMatrixd(rotateXMatrix);
 }
 
+void drawColorPicker(){
+	/*glBegin(GL_QUADS);
+	glColor3f(1, 0, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, glutGet(GLUT_WINDOW_HEIGHT) - 100, 0); // top left
+	glColor3f(0, 1, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT) - 100, 0.0); // top right
+	glColor3f(0, 0, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) -100, glutGet(GLUT_WINDOW_HEIGHT), 0.0); // bot left
+	glColor3f(1, 1, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), 0.0); // bot right
+	glEnd();*/
+
+	glBegin(GL_QUADS);
+	glColor3f(1, 0, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100,0, 0); // top left
+	glColor3f(0, 1, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 100, 0.0); // top right
+	glColor3f(0, 0, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 0, 0.0); // bot left
+	glColor3f(1, 1, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 100, 0.0); // bot right
+	glEnd();
+}
 
 void display(){
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -172,6 +195,25 @@ void display(){
 	drawCoordinateSystem();
 
 	glPopMatrix();
+
+
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	gluOrtho2D(0.0, 1600, 0.0, 800);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	drawColorPicker();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
 
 	glutSwapBuffers();
 
