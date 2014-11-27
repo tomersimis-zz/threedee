@@ -180,18 +180,19 @@ void drawCube(float x, float y, float z)
 {
 	glPushMatrix();
 	glTranslatef(x, y, z);
+	glScaled(-1, -1, -1);
 	glRotated(camera.yawAngle, 0, 1, 0);
-	glRotated(camera.pitchAngle, 1, 0, 0);
+	glRotated(-camera.pitchAngle, 1, 0, 0);
 	
 	GLUquadricObj *quadratic = gluNewQuadric();
-	gluCylinder(quadratic, 5, 5, 20, 32, 32);
+	gluCylinder(quadratic, 1, 1, 10, 32, 32);
 
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(x, y, z);
 	glRotated(camera.yawAngle, 0, 1, 0);
-	glRotated(camera.pitchAngle, 1, 0, 0);
+	glRotated(-camera.pitchAngle, 1, 0, 0);
 	
 	glScaled(3, 3,3);
 
@@ -684,7 +685,7 @@ int main(int argc, char** argv)
 	mousePosition = new Point(0, 0, 0);
 	mouseInitialPosition = new Point(0, 0, 0);
 
-	camera = Camera(0, 0, 100);
+	camera = Camera(0, 0, 50);
 	camera2 = Camera(100, 100, 100);
 
 	glutMainLoop();
