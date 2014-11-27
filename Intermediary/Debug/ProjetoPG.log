@@ -1,11 +1,41 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(356,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
-C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(357,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  ProjetoPG.cpp
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(20): warning C4005: '_CRT_SECURE_NO_WARNINGS' : macro redefinition
-          command-line arguments :  see previous definition of '_CRT_SECURE_NO_WARNINGS'
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(135): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(160): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(594): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(598): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(602): warning C4018: '<' : signed/unsigned mismatch
-  ProjetoPG.vcxproj -> C:\Users\Tomer Simis\Desktop\threedee\.\Output\Debug\ProjetoPG.exe
+﻿Build started 27/11/2014 17:10:59.
+     1>Project "C:\Users\tls\Desktop\td\threedee\ProjetoPG.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(356,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(357,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I.\Dependencies\Include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _CRT_SECURE_NO_WARNINGS /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Intermediary\Debug\\" /Fd".\Intermediary\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ProjetoPG.cpp
+         ProjetoPG.cpp
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(20): warning C4005: '_CRT_SECURE_NO_WARNINGS' : macro redefinition
+                 command-line arguments :  see previous definition of '_CRT_SECURE_NO_WARNINGS'
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(137): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(164): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(654): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(658): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(662): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(682): warning C4101: 'h' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(682): warning C4101: 'e2' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(682): warning C4101: 's' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(682): warning C4101: 'q' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(682): warning C4101: 'e1' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(726): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(738): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(746): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(737): warning C4101: 'ty' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(737): warning C4101: 'tz' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(737): warning C4101: 'tx' : unreferenced local variable
+     1>c:\users\tls\desktop\td\threedee\projetopg.cpp(813): warning C4101: 'winZ' : unreferenced local variable
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Output\Debug\ProjetoPG.exe" /INCREMENTAL /NOLOGO /LIBPATH:.\Dependencies\Lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:".\Output\Debug\ProjetoPG.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\Output\Debug\ProjetoPG.lib" /MACHINE:X86 .\Intermediary\Debug\Camera.obj
+         .\Intermediary\Debug\Face.obj
+         .\Intermediary\Debug\Loader.obj
+         .\Intermediary\Debug\Object.obj
+         .\Intermediary\Debug\Point.obj
+         .\Intermediary\Debug\ProjetoPG.obj
+         .\Intermediary\Debug\Transform.obj
+         .\Intermediary\Debug\Vector.obj
+         ProjetoPG.vcxproj -> C:\Users\tls\Desktop\td\threedee\.\Output\Debug\ProjetoPG.exe
+     1>Done Building Project "C:\Users\tls\Desktop\td\threedee\ProjetoPG.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.20

@@ -37,6 +37,8 @@ vector<vector<Face>> MEM_VEC_FACES;
 
 bool director = false;
 
+bool directorClicked = false;
+
 bool colorPicker = false;
 
 bool picking = false;
@@ -62,19 +64,19 @@ void drawCoordinateSystem(){
 
 	glPushMatrix();
 
-	glLineWidth(1.0);
-	glColor3d(0.2, 0.64, 0.76);
+	glLineWidth(2.0);
+	glColor3d(0.9, 0.9, 0.9);
 
 	glBegin(GL_LINES);
 
-	glVertex3d(-10000, 0, 0);
-	glVertex3d(10000, 0, 0);
+	glVertex3d(-100, 0, 0);
+	glVertex3d(100, 0, 0);
 
-	glVertex3d(0, -10000, 0);
-	glVertex3d(0, 10000, 0);
+	glVertex3d(0, -100, 0);
+	glVertex3d(0, 100, 0);
 
-	glVertex3d(0, 0, -10000);
-	glVertex3d(0, 0, 10000);
+	glVertex3d(0, 0, -100);
+	glVertex3d(0, 0, 100);
 
 	glEnd();
 
@@ -189,18 +191,45 @@ void drawObjects(){
 	}
 }
 
+void drawGrid(){
+	glDisable(GL_LIGHTING);
+
+	glPushMatrix();
+
+	glColor3f(.2, .2, .2);
+
+	glLineWidth(1.0);
+
+
+	glBegin(GL_LINES);
+	for (int i = -50; i <= 50; i++) {
+
+		glVertex3f(-100, 0, i * 2);
+		glVertex3f(100, 0, i * 2);
+		glVertex3f(i * 2, 0, -100);
+		glVertex3f(i * 2, 0, 100);
+
+	};
+	glEnd();
+
+
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+
+}
+
 void drawCamera(float x, float y, float z)
 {
 
 	glColor3d(1.0, 1.0, 0.0);
 
 	glPushMatrix();
-	
+
 	glTranslatef(x, y, z);
 	glScaled(-1, -1, -1);
 	glRotated(camera.yawAngle, 0, 1, 0);
 	glRotated(-camera.pitchAngle, 1, 0, 0);
-	
+
 	GLUquadricObj *quadratic = gluNewQuadric();
 	gluCylinder(quadratic, 1, 1, 3, 32, 32);
 
@@ -210,8 +239,8 @@ void drawCamera(float x, float y, float z)
 	glTranslatef(x, y, z);
 	glRotated(camera.yawAngle, 0, 1, 0);
 	glRotated(-camera.pitchAngle, 1, 0, 0);
-	
-	glScaled(3, 3,3);
+
+	glScaled(3, 3, 3);
 
 	glutSolidCube(1);
 
@@ -233,7 +262,6 @@ void display(){
 	glLoadIdentity();
 	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
 	
-
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -255,11 +283,11 @@ void display(){
 
 	drawObjects();
 
-
-
 	/* Coordinate system drawing */
 
 	drawCoordinateSystem();
+
+	drawGrid();
 
 	if (colorPicker)
 		drawColorPicker();
@@ -283,6 +311,8 @@ void display(){
 		glLoadMatrixd(m2);
 
 		drawObjects();
+
+		drawGrid();
 
 		glColor3d(1.0, 0.0, 0.0);
 		drawCamera(camera.position.x, camera.position.y, camera.position.z);
@@ -456,19 +486,39 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'w':
 	case 'W':
-		camera.slide(0, 0, -1);
+		if (director && x > windowWidth / 2){
+			camera2.slide(0, 0, -1);
+		}
+		else{
+			camera.slide(0, 0, -1);
+		}
 		break;
 	case 's':
 	case 'S':
-		camera.slide(0, 0, 1);
+		if (director && x > windowWidth / 2){
+			camera2.slide(0, 0, 1);
+		}
+		else{
+			camera.slide(0, 0, 1);
+		}
 		break;
 	case 'd':
 	case 'D':
-		camera.slide(1, 0, 0);
+		if (director && x > windowWidth / 2){
+			camera2.slide(1, 0, 0);
+		}
+		else{
+			camera.slide(1, 0, 0);
+		}
 		break;
 	case 'a':
 	case 'A':
-		camera.slide(-1, 0, 0);
+		if (director && x > windowWidth / 2){
+			camera2.slide(-1, 0, 0);
+		}
+		else{
+			camera.slide(-1, 0, 0);
+		}
 		break;
 	case '-':
 	case '_':
@@ -767,6 +817,12 @@ void mousePress(int btn, int state, int x, int y){
 			}
 			else CLICKED = 1;
 
+			if (director && x > windowWidth / 2){
+				directorClicked = true;
+			}
+			else{
+				directorClicked = false;
+			}
 
 			drag = false;
 			if (colorPicker && x > glutGet(GLUT_WINDOW_WIDTH) - 120 && y > glutGet(GLUT_WINDOW_HEIGHT) - 120){ // picking a color
@@ -793,8 +849,14 @@ void mousePress(int btn, int state, int x, int y){
 
 void mouseMove(int x, int y){
 	if (!picking){
-		camera.yawAngle += (x - mouseInitialPosition->x)*0.5;
-		camera.pitchAngle += (y - mouseInitialPosition->y)*0.5;
+		if (directorClicked){
+			camera2.yawAngle += (x - mouseInitialPosition->x)*0.5;
+			camera2.pitchAngle += (y - mouseInitialPosition->y)*0.5;
+		}
+		else{
+			camera.yawAngle += (x - mouseInitialPosition->x)*0.5;
+			camera.pitchAngle += (y - mouseInitialPosition->y)*0.5;
+		}
 		mouseInitialPosition->x = x;
 		mouseInitialPosition->y = y;
 	}
@@ -808,9 +870,9 @@ int main(int argc, char** argv)
 	//mainMenu(4);
 
 	glutCreateWindow("Hello World");
-	glutInitWindowSize(800, 600);
+	//glutInitWindowSize(800, 600);
 
-	//glutFullScreen();
+	glutFullScreen();
 
 	glutDisplayFunc(display);
 
