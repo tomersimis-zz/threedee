@@ -85,6 +85,19 @@ void drawCoordinateSystem(){
 	glEnable(GL_LIGHTING);
 }
 
+void drawSquare(int x, int y, int size, double r, double g, double b){
+	glBegin(GL_TRIANGLES);
+	glColor3f(r, g, b);
+	glVertex3f(x - size, y - size, 0); // top left
+	glVertex3f(x + size, y - size, 0); // top right
+	glVertex3f(x - size, y + size, 0); // bot left
+
+	glVertex3f(x - size, y + size, 0); // bot left
+	glVertex3f(x + size, y - size, 0); // top right
+	glVertex3f(x + size, y + size, 0); // bot right
+	glEnd();
+}
+
 void drawColorPicker(){
 
 	glDisable(GL_LIGHTING);
@@ -98,29 +111,41 @@ void drawColorPicker(){
 	glPushMatrix();
 	glLoadIdentity();
 
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 80, 110, 10, (double)229 / 255, (double)24 / 255, 0);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 50, 110, 10, (double)127 / 255, (double)13 / 255, 0);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 20, 110, 10, (double)64 / 255, (double)7 / 255, 0);
+
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 80, 80, 10, (double)14 / 255, (double)229 / 255, 0);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 50, 80, 10, (double)8 / 255, (double)127 / 255, 0);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 20, 80, 10, (double)4 / 255, (double)64 / 255, 0);
+
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 80, 50, 10, 0, (double)9 / 255, (double)229 / 255);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 50, 50, 10, 0, (double)5 / 255, (double)227 / 255);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 20, 50, 10, 0, (double)2 / 255, (double)64 / 255);
+
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 80, 20, 10, 0, 0, 0);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 50, 20, 10, 0.5, 0.5, 0.5);
+
+	drawSquare(glutGet(GLUT_WINDOW_WIDTH) - 20, 30, 10, 1, 1, 1);
+
 	glBegin(GL_TRIANGLES);
 	glColor3f(1, 1, 1);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 105, 105, 0); // top left
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 105, 0, 0); // bot left
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 105, 0); // top right
-
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 105, 0); // top right
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 0, 0); // bot right
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 105, 0, 0); // bot left
-
-	glColor3f(1, 0, 0);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 100, 0); // top left
-	glColor3f(0, 1, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 130, 0); // top left
 	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 0, 0); // bot left
-	glColor3f(0, 0, 1);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 100, 0); // top right
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 130, 0); // top right
 
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 100, 0); // top right
-
-	glColor3f(1, 1, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 130, 0); // top right
 	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 0, 0); // bot right
-
-	glColor3f(0, 1, 0);
 	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 0, 0); // bot left
 
 	glEnd();
@@ -132,6 +157,7 @@ void drawColorPicker(){
 
 	glEnable(GL_LIGHTING);
 }
+
 
 void drawObjects(){
 	for (int i = 0; i < objects.size(); i++){
