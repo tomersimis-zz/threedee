@@ -241,7 +241,7 @@ void display(){
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glColor3d(0.0, 0.0, 0.0);
 
@@ -300,6 +300,9 @@ void display(){
 }
 
 void setLightning(){
+	glClearDepth(1.0f);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 
 	const GLfloat light0_color[4] = { .3, .3, .3, 0.0 };
 	GLfloat light0_shininess[] = { 40.0 };
