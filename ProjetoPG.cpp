@@ -34,6 +34,10 @@ vector<vector<Point>> MEM_VEC_POINTS;
 vector<vector<Vector>> MEM_VEC_VECTOR;
 vector<vector<Face>> MEM_VEC_FACES;
 
+bool colorPicker = false;
+
+bool picking = false;
+
 bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
@@ -47,6 +51,11 @@ float near = 0.1;
 int selectedObject = 0;
 
 void drawCoordinateSystem(){
+
+	glDisable(GL_LIGHTING);
+
+	glPushMatrix();
+
 	glLineWidth(1.0);
 	glColor3d(0.2, 0.64, 0.76);
 
@@ -62,9 +71,24 @@ void drawCoordinateSystem(){
 	glVertex3d(0, 0, 10000);
 
 	glEnd();
+
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
 }
 
 void drawColorPicker(){
+
+	glDisable(GL_LIGHTING);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	gluOrtho2D(0.0, 1600, 0.0, 800);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 
 	glBegin(GL_TRIANGLES);
 	glColor3f(1, 1, 1);
@@ -92,6 +116,13 @@ void drawColorPicker(){
 	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 0, 0); // bot left
 
 	glEnd();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
 }
 
 void display(){
@@ -163,31 +194,11 @@ void display(){
 
 
 	/* Coordinate system drawing */
-	glPushMatrix();
 
 	drawCoordinateSystem();
 
-	glPopMatrix();
-
-	glDisable(GL_LIGHTING);
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-
-	gluOrtho2D(0.0, 1600, 0.0, 800);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	drawColorPicker();
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	glEnable(GL_LIGHTING);
+	if (colorPicker)
+		drawColorPicker();
 
 	glutSwapBuffers();
 
@@ -220,10 +231,10 @@ void setLightning(){
 
 void reshape(int w, int h){
 
-#ifdef DEBUG
-	printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
-#endif
-
+	#ifdef DEBUG
+		printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
+	#endif
+	
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -369,6 +380,10 @@ void keyboard(unsigned char key, int x, int y){
 	case 'N':
 		light = (light + 1) % 2;
 		break;
+	case 'C':
+	case 'c':
+		colorPicker = !colorPicker;
+		break;
 	case 'M':
 	case 'm':
 		if (enable){
@@ -507,22 +522,42 @@ void mainMenu(int item){
 
 void mousePress(int btn, int state, int x, int y){
 	if (btn == GLUT_LEFT_BUTTON){
+
 		if (state == GLUT_UP){
 			drag = false;
+			picking = false;
 		}
 		else{
-			drag = true;
-			mouseInitialPosition->x = x;
-			mouseInitialPosition->y = y;
+			drag = false;
+			if (colorPicker && x > glutGet(GLUT_WINDOW_WIDTH) - 120 && y > glutGet(GLUT_WINDOW_HEIGHT) - 120){ // picking a color
+				picking = true;
+
+				GLint viewport[4];
+				GLubyte pixel[3];
+
+				glGetIntegerv(GL_VIEWPORT, viewport);
+
+				glReadPixels(x, viewport[3] - y, 1, 1,
+					GL_RGB, GL_UNSIGNED_BYTE, (void *)pixel);
+
+				printf(">>>>>%d %d %d\n", pixel[0], pixel[1], pixel[2]);
+			}
+			else{
+				
+				mouseInitialPosition->x = x;
+				mouseInitialPosition->y = y;
+			}
 		}
 	}
 }
 
 void mouseMove(int x, int y){
-	camera.yawAngle += (x - mouseInitialPosition->x)*0.5;
-	camera.pitchAngle += (y - mouseInitialPosition->y)*0.5;
-	mouseInitialPosition->x = x;
-	mouseInitialPosition->y = y;
+	if (!picking){
+		camera.yawAngle += (x - mouseInitialPosition->x)*0.5;
+		camera.pitchAngle += (y - mouseInitialPosition->y)*0.5;
+		mouseInitialPosition->x = x;
+		mouseInitialPosition->y = y;
+	}
 }
 
 int main(int argc, char** argv)
