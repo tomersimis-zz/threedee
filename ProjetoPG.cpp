@@ -47,7 +47,7 @@ bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
-GLfloat light_position[2][4] = { { 0, 0, 0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
+GLfloat light_position[2][4] = { { 1, 1, 0, 0.0 }, { 1.0, 1.0, .5, 0.0 } };
 int light = 0;
 bool enable = false;
 
@@ -57,6 +57,23 @@ int selectedObject = 0;
 
 int windowWidth;
 int windowHeight;
+
+void setLightning();
+void drawCoordinateSystem();
+void drawSquare(); 
+void drawColorPicker();
+void drawObjects();
+void drawCamera();
+void display();
+void reshape();
+void mainMenu();
+int rayIntersectsTriangle();
+pair<Point, Point> fromScreenToWorld();
+bool pointIn();
+void paintFace();
+void mousePress();
+void mouseMove();
+
 
 void drawCoordinateSystem(){
 
@@ -186,13 +203,28 @@ void drawObjects(){
 		double R, G, B;
 
 		int index;
-		
+		int contador = 0;
 		for (int j = 0; j < objects[i].faces.size(); j++){
 			R = objects[i].faces[j]->R;
 			G = objects[i].faces[j]->G;
 			B = objects[i].faces[j]->B;
 			glColor3f(R, G, B);
 			glBegin(GL_TRIANGLES);
+			
+			contador = (contador + 1) % 10;
+			if (contador == 8){
+				//glMaterial(0,1,0);
+				GLfloat light1_ambient[] = { .5, 0.0, 0.0, 1.0 };
+				GLfloat light1_diffuse[] = { .5, 0.0, 0.0, 1.0 };
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light1_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light1_diffuse);
+			}
+			else{
+				GLfloat light1_ambient[] = { 0.0, 0.5, 0.0, 1.0 };
+				GLfloat light1_diffuse[] = { 0.0, 0.5, 0.0, 1.0 };
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light1_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light1_diffuse);
+			}
 
 			#ifdef DRAW_NORMAL
 			index = objects[i].faces[j]->v1->index;
@@ -309,6 +341,7 @@ void display(){
 
 	drawObjects();
 
+	setLightning();
 	/* Coordinate system drawing */
 
 	drawCoordinateSystem();
@@ -351,29 +384,21 @@ void display(){
 }
 
 void setLightning(){
+	glEnable(GL_LIGHTING);
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
 
-	const GLfloat light0_color[4] = { .3, .3, .3, 0.0 };
-	GLfloat light0_shininess[] = { 40.0 };
-
-	GLfloat light1_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-	GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	const GLfloat light1_color[4] = { .3, .3, .3, 0.0 };
-	GLfloat light1_shininess[] = { 40.0 };
+	GLfloat light1_ambient[] = { .5, 0.0, 0.0, 1.0 };
+	GLfloat light1_diffuse[] = { .5, 0.0, 0.0, 1.0 };
 
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position[0]);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, light0_color);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, light0_shininess);
 
 	glEnable(GL_LIGHT1);
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position[1]);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, light1_color);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, light1_shininess);
 }
 
 void reshape(int w, int h){
