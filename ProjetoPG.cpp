@@ -29,10 +29,13 @@
 std::vector<Object> objects;
 
 Camera camera;
+Camera camera2;
 
 vector<vector<Point>> MEM_VEC_POINTS;
 vector<vector<Vector>> MEM_VEC_VECTOR;
 vector<vector<Face>> MEM_VEC_FACES;
+
+bool director = false;
 
 bool colorPicker = false;
 
@@ -125,26 +128,7 @@ void drawColorPicker(){
 	glEnable(GL_LIGHTING);
 }
 
-void display(){
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glColor3d(0.0, 0.0, 0.0);
-
-	glPointSize(1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-
-	double m[16] = {
-		camera.getMatrix()[0], camera.getMatrix()[1], camera.getMatrix()[2], camera.getMatrix()[3],
-		camera.getMatrix()[4], camera.getMatrix()[5], camera.getMatrix()[6], camera.getMatrix()[7],
-		camera.getMatrix()[8], camera.getMatrix()[9], camera.getMatrix()[10], camera.getMatrix()[11],
-		camera.getMatrix()[12], camera.getMatrix()[13], camera.getMatrix()[14], camera.getMatrix()[15],
-	};
-
-	glLoadMatrixd(m);
-
+void drawObjects(){
 	for (int i = 0; i < objects.size(); i++){
 		glPushMatrix();
 
@@ -172,9 +156,9 @@ void display(){
 		glBegin(GL_TRIANGLES);
 		for (int j = 0; j < objects[i].faces.size(); j++){
 			#ifdef DRAW_NORMAL
-				index = objects[i].faces[j]->v1->index;
-				glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
-				glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
+			index = objects[i].faces[j]->v1->index;
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
+			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
 			#endif
 
 			index = objects[i].faces[j]->v2->index;
@@ -190,6 +174,91 @@ void display(){
 		glPopMatrix();
 
 	}
+}
+
+void drawCube(float x, float y, float z)
+{
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glRotated(camera.yawAngle, 0, 1, 0);
+	glRotated(camera.pitchAngle, 1, 0, 0);
+	
+	GLUquadricObj *quadratic = gluNewQuadric();
+	gluCylinder(quadratic, 5, 5, 20, 32, 32);
+
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glRotated(camera.yawAngle, 0, 1, 0);
+	glRotated(camera.pitchAngle, 1, 0, 0);
+	
+	glScaled(3, 3,3);
+
+	glBegin(GL_QUADS);
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(1.0f, -1.0f, -1.0f);
+	glVertex3f(1.0f, 1.0f, -1.0f);
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, -1.0f);
+
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+
+	glVertex3f(-1.0f, 1.0f, -1.0f);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(1.0f, 1.0f, -1.0f);
+	glEnd();
+
+	glPopMatrix();
+}
+
+void display(){
+
+	if (director){
+		glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT));
+	}else{
+		glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	}
+	
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glColor3d(0.0, 0.0, 0.0);
+
+	glPointSize(1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+
+	double m[16] = {
+		camera.getMatrix()[0], camera.getMatrix()[1], camera.getMatrix()[2], camera.getMatrix()[3],
+		camera.getMatrix()[4], camera.getMatrix()[5], camera.getMatrix()[6], camera.getMatrix()[7],
+		camera.getMatrix()[8], camera.getMatrix()[9], camera.getMatrix()[10], camera.getMatrix()[11],
+		camera.getMatrix()[12], camera.getMatrix()[13], camera.getMatrix()[14], camera.getMatrix()[15],
+	};
+
+	glLoadMatrixd(m);
+
+	drawObjects();
 
 
 
@@ -200,6 +269,30 @@ void display(){
 	if (colorPicker)
 		drawColorPicker();
 
+	if (director){
+		glViewport(glutGet(GLUT_WINDOW_WIDTH) / 2, 0, glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT));
+
+		glColor3d(0.0, 0.0, 0.0);
+
+		glPointSize(1.0);
+
+		glMatrixMode(GL_MODELVIEW);
+
+		double m2[16] = {
+			camera2.getMatrix()[0], camera2.getMatrix()[1], camera2.getMatrix()[2], camera2.getMatrix()[3],
+			camera2.getMatrix()[4], camera2.getMatrix()[5], camera2.getMatrix()[6], camera2.getMatrix()[7],
+			camera2.getMatrix()[8], camera2.getMatrix()[9], camera2.getMatrix()[10], camera2.getMatrix()[11],
+			camera2.getMatrix()[12], camera2.getMatrix()[13], camera2.getMatrix()[14], camera2.getMatrix()[15],
+		};
+
+		glLoadMatrixd(m2);
+
+		drawObjects();
+
+		glColor3d(1.0, 0.0, 0.0);
+		drawCube(camera.position.x, camera.position.y, camera.position.z);
+
+	}
 	glutSwapBuffers();
 
 	glutPostRedisplay();
@@ -235,7 +328,8 @@ void reshape(int w, int h){
 		printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
 	#endif
 	
-	glViewport(0, 0, w, h);
+	
+	glViewport(w/2, 0, w/2, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
@@ -383,6 +477,10 @@ void keyboard(unsigned char key, int x, int y){
 	case 'C':
 	case 'c':
 		colorPicker = !colorPicker;
+		break;
+	case 'V':
+	case 'v':
+		director = !director;
 		break;
 	case 'M':
 	case 'm':
@@ -584,6 +682,7 @@ int main(int argc, char** argv)
 	mouseInitialPosition = new Point(0, 0, 0);
 
 	camera = Camera(0, 0, 100);
+	camera2 = Camera(100, 100, 100);
 
 	glutMainLoop();
 	return 0;
