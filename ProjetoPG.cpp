@@ -53,7 +53,12 @@ bool enable = false;
 
 float near = 0.1;
 
+bool PAINT_ALL_FLAG;
+
+
 int selectedObject = 0;
+
+int NEXT_INDEX; 
 
 int windowWidth;
 int windowHeight;
@@ -74,6 +79,25 @@ void paintFace();
 void mousePress();
 void mouseMove();
 
+GLfloat MATERIALS_AMBIENT[7][3] = {
+		{ 0.25, 1, 0.25 },
+		{ 0, 1, 0.5 },
+		{ 0.3, 0, 1 },
+		{ 0, 1, 1 },
+		{ 1, 0.5, 0.9 },
+		{ 0.8, 0.1, 0.35 },
+		{ 1, 0.8, 0 }
+};
+
+GLfloat MATERIALS_DIFFUSE[7][3] = {
+		{ 1, 1, 1 },
+		{ 0, 1, 0 },
+		{ 1, 0, 0 },
+		{ 0, 0, 1 },
+		{ 0.2, 0.5, 0.9 },
+		{ 0.8, 0.1, 0.35 },
+		{ 0.1, 0.5, 0.4 }
+};
 
 void drawCoordinateSystem(){
 
@@ -202,30 +226,22 @@ void drawObjects(){
 
 		double R, G, B;
 
-		int index;
-		int contador = 0;
+		int index, materialIndex;
+		//int contador = 0;
 		for (int j = 0; j < objects[i].faces.size(); j++){
-			R = objects[i].faces[j]->R;
-			G = objects[i].faces[j]->G;
-			B = objects[i].faces[j]->B;
-			glColor3f(R, G, B);
-			glBegin(GL_TRIANGLES);
 			
-			contador = (contador + 1) % 10;
-			if (contador == 8){
-				//glMaterial(0,1,0);
-				GLfloat light1_ambient[] = { .5, 0.0, 0.0, 1.0 };
-				GLfloat light1_diffuse[] = { .5, 0.0, 0.0, 1.0 };
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light1_ambient);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light1_diffuse);
-			}
-			else{
-				GLfloat light1_ambient[] = { 0.0, 0.5, 0.0, 1.0 };
-				GLfloat light1_diffuse[] = { 0.0, 0.5, 0.0, 1.0 };
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light1_ambient);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light1_diffuse);
+			if (PAINT_ALL_FLAG) {
+				//objects[i].faces[j]->materialIndex = NEXT_INDEX;
+				objects[i].faces[j]->materialIndex = 2;
+				
 			}
 
+			glBegin(GL_TRIANGLES);
+			materialIndex = objects[i].faces[j]->materialIndex;
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, MATERIALS_AMBIENT[materialIndex]);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MATERIALS_DIFFUSE[materialIndex]);
+			
+		
 			#ifdef DRAW_NORMAL
 			index = objects[i].faces[j]->v1->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
@@ -242,7 +258,10 @@ void drawObjects(){
 		
 			glEnd();
 		}
-		
+		if (PAINT_ALL_FLAG) {
+			PAINT_ALL_FLAG = 0;
+			NEXT_INDEX++; NEXT_INDEX %= 5;
+		}
 
 		glPopMatrix();
 
@@ -372,6 +391,7 @@ void display(){
 		drawObjects();
 
 		drawGrid();
+		setLightning();
 
 		glColor3d(1.0, 0.0, 0.0);
 		drawCamera(camera.position.x, camera.position.y, camera.position.z);
@@ -384,6 +404,8 @@ void display(){
 }
 
 void setLightning(){
+	//glPushMatrix();
+	//glLoadIdentity();
 	glEnable(GL_LIGHTING);
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LESS);
@@ -399,6 +421,7 @@ void setLightning(){
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position[1]);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+	//glPopMatrix();
 }
 
 void reshape(int w, int h){
@@ -423,7 +446,7 @@ void reshape(int w, int h){
 	glLoadIdentity();
 	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
 
-	setLightning();
+	
 }
 
 
@@ -650,7 +673,14 @@ void keyboard(unsigned char key, int x, int y){
 		glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
 		break;
 		break;
+	case 'p':
+	case 'P':
+		if (!PAINT_ALL_FLAG){
+			PAINT_ALL_FLAG = 1;
+		}
 
+		break;
+		break;
 	}
 
 }
@@ -779,6 +809,8 @@ bool pointIn(pair<Point, Point> par, Face f){
 
 
 void paintFace(pair<Point, Point> par){
+	if (PAINT_ALL_FLAG) return;
+
 	printf("Camera---> %lf %lf %lf\n", camera.position.x, camera.position.y, camera.position.z);
 	Face f, fobj;
 	double R = 0.5, G = 0.5, B = 0.5;
@@ -902,13 +934,19 @@ void paintFace(pair<Point, Point> par){
 			}
 		}
 	}
-	if (found){
+	if (found && !PAINT_ALL_FLAG){
 
 		int i = index.first, j = index.second;
 		printf("Face index: %d %d\n", i, j);
+
+		//objects[i].faces[j]->materialIndex = NEXT_INDEX;
+		objects[i].faces[j]->materialIndex = 2;
+		NEXT_INDEX++; NEXT_INDEX %= 5;
+
 		objects[i].faces[j]->R = R;
 		objects[i].faces[j]->G = G;
 		objects[i].faces[j]->B = B;
+
 	}
 
 
