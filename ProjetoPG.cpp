@@ -45,9 +45,10 @@ bool drag;
 Point* mousePosition;
 Point* mouseInitialPosition;
 
-GLfloat light_position[2][4] = { { 0, 0, 0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 } };
+GLfloat light_position[2][4] = { {-1, 1, 0, 0.0 }, { 1, 1, 0.0, 0.0 } };
 int light = 0;
-bool enable = false;
+
+void setLightning();
 
 float near = 0.1;
 
@@ -63,7 +64,7 @@ void drawCoordinateSystem(){
 	glPushMatrix();
 
 	glLineWidth(1.0);
-	glColor3d(0.2, 0.64, 0.76);
+	/*glColor3d(0.2, 0.64, 0.76);*/
 
 	glBegin(GL_LINES);
 
@@ -156,15 +157,31 @@ void drawObjects(){
 		glMultMatrixd(scaleMatrix);
 
 		double R, G, B;
-
-		int index;
 		
+		int contador = 0;
+		int index;
 		for (int j = 0; j < objects[i].faces.size(); j++){
 			R = objects[i].faces[j]->R;
 			G = objects[i].faces[j]->G;
 			B = objects[i].faces[j]->B;
-			glColor3f(R, G, B);
+
+
+			
 			glBegin(GL_TRIANGLES);
+			//contador = (contador + 1) % 10;
+			//if (contador == 8){
+			//	//glMaterial(0,1,0);
+			//	GLfloat light1_ambient[] = { .5, 0.0, 0.0, 1.0 };
+			//	GLfloat light1_diffuse[] = { .5, 0.0, 0.0, 1.0 };
+			//	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light1_ambient);
+			//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light1_diffuse);
+			//}
+			//else{
+			//	GLfloat light1_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+			//	GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+			//	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, light1_ambient);
+			//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, light1_diffuse);
+			//}
 
 			#ifdef DRAW_NORMAL
 			index = objects[i].faces[j]->v1->index;
@@ -255,7 +272,7 @@ void display(){
 
 	drawObjects();
 
-
+	setLightning();
 
 	/* Coordinate system drawing */
 
@@ -284,7 +301,7 @@ void display(){
 
 		drawObjects();
 
-		glColor3d(1.0, 0.0, 0.0);
+		/*glColor3d(1.0, 0.0, 0.0);*/
 		drawCamera(camera.position.x, camera.position.y, camera.position.z);
 
 	}
@@ -295,29 +312,22 @@ void display(){
 }
 
 void setLightning(){
+	
+	glEnable(GL_LIGHTING);
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
 
-	const GLfloat light0_color[4] = { .3, .3, .3, 0.0 };
-	GLfloat light0_shininess[] = { 40.0 };
-
-	GLfloat light1_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-	GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	const GLfloat light1_color[4] = { .3, .3, .3, 0.0 };
-	GLfloat light1_shininess[] = { 40.0 };
+	GLfloat light1_ambient[] = { .5, 0.0, 0.0, 1.0 };
+	GLfloat light1_diffuse[] = { .5, 0.0, 0.0, 1.0 };
 
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position[0]);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, light0_color);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, light0_shininess);
 
 	glEnable(GL_LIGHT1);
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position[1]);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, light1_color);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, light1_shininess);
 }
 
 void reshape(int w, int h){
@@ -489,17 +499,6 @@ void keyboard(unsigned char key, int x, int y){
 	case 'V':
 	case 'v':
 		director = !director;
-		break;
-	case 'M':
-	case 'm':
-		if (enable){
-			enable = false;
-			glDisable(GL_LIGHTING);
-		}
-		else{
-			enable = true;
-			glEnable(GL_LIGHTING);
-		}
 		break;
 	case '.':
 	case '>':
@@ -805,7 +804,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
 	mainMenu(1);
-	//mainMenu(4);
+	mainMenu(4);
 
 	glutCreateWindow("Hello World");
 	glutInitWindowSize(800, 600);
