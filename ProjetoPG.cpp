@@ -512,7 +512,7 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case '6':
 		if (mode == 0){
-			objects[selectedObject].translationY += 0.1;
+			objects[selectedObject].translationZ += 0.1;
 		}
 		else{
 			light_position[light][2] -= 0.05;
@@ -785,37 +785,103 @@ void paintFace(pair<Point, Point> par){
 	bool ok;
 	pair<int, int> index; // first == object, second == face;
 	bool found = 0;
-	double minDist = 0x3f3f3f, tx, ty, tz, dx, dy, dz, angleX, angleY, angleZ;
+	Point aux1 = Point(par.first.x, par.first.y, par.first.z);
+	Point aux2 = Point(par.second.x, par.second.y, par.second.z);
+
+	double minDist = 0x3f3f3f, tx, ty, tz, dx, dy, dz, angleX, angleY, angleZ, scale;
 	for (int i = 0; i < objects.size(); i++){
+		par.first = Point(aux1.x, aux1.y, aux1.z);
+		par.second = Point(aux2.x, aux2.y, aux2.z);
+
 		dx = objects[i].translationX;
 		dy = objects[i].translationY;
 		dz = objects[i].translationZ;
 		angleX = objects[i].rotationX;
 		angleY = objects[i].rotationY;
-		angleZ = objects[i].rotationZ;
+		angleZ = (objects[i].rotationZ);
+		scale = objects[i].scale;
+
+		angleX *= -1;
+		angleY *= 1;
+		angleZ *= -1;
+
+		// translate
+		par.first.x -= dx;
+		par.first.y -= dy;
+		par.first.z -= dz;
+
+		par.second.x -= dx;
+		par.second.y -= dy;
+		par.second.z -= dz;
+
+		//scale
+		par.first = par.first.multiplyScalar(1.0 / scale);
+		par.second = par.second.multiplyScalar(1.0 / scale);
+
+		par.first = par.first.rotate(angleX, 0);
+		par.first = par.first.rotate(angleY, 1);
+		par.first = par.first.rotate(angleZ, 2);
+
+		par.second = par.second.rotate(angleX, 0);
+		par.second = par.second.rotate(angleY, 1);
+		par.second = par.second.rotate(angleZ, 2);
+
+
+
+		//printf("Dx:%lf | DY: %lf  | DZ: %lf | scale: %lf | angle: %lf %lf %lf\n", dx, dy, dz, scale, angleX, angleY, angleZ);
 
 		for (int j = 0; j < objects[i].faces.size(); j++){
 			fobj = *(objects[i].faces[j]);
 			Point pa, pb, pc;
-			pa = *(fobj.v1);
-			/*
-			pa = pa.rotate(angleX, 0);
-			pa = pa.rotate(angleY, 1);
-			pa = pa.rotate(angleZ, 2);
 
-			pb = fobj.v2->rotate(angleX, 0);
+
+			pa = *(fobj.v1);
+			pb = *(fobj.v2);
+			pc = *(fobj.v3);
+
+			pa = Point(pa.x, pa.y, pa.z);
+			pb = Point(pb.x, pb.y, pb.z);
+			pc = Point(pc.x, pc.y, pc.z);
+
+			/*
+			// Rotate
+			pa = pa.rotate(angleX, 0);
+			pa = pa.rotate( angleY, 1);
+			pa = pa.rotate( angleZ, 2);
+
+			pb = pb.rotate( angleX, 0);
 			pb = pb.rotate(angleY, 1);
 			pb = pb.rotate(angleZ, 2);
 
-			pc = fobj.v3->rotate(angleX, 0);
-			pc = pc.rotate(angleY, 1);
-			pc = pc.rotate(angleZ, 2);
-			*/
+			pc = pc.rotate( angleX, 0);
+			pc = pc.rotate( angleY, 1);
+			pc = pc.rotate( angleZ, 2);
 
+			//Translate
+			pa.x += dx;
+			pb.x += dx;
+			pc.x += dx;
+
+
+			pa.y += dy;
+			pb.y += dy;
+			pc.y += dy;
+
+			pa.z += dz;
+			pb.z += dz;
+			pc.z += dz;
+
+			//Scale
+			pa = pa.multiplyScalar(scale);
+			pb = pb.multiplyScalar(scale);
+			pc = pc.multiplyScalar(scale);
+
+			*/
+			/*
 			pa = Point(fobj.v1->x + dx, fobj.v1->y + dy, fobj.v1->z + dz);
 			pb = Point(fobj.v2->x + dx, fobj.v2->y + dy, fobj.v2->z + dz);
 			pc = Point(fobj.v3->x + dx, fobj.v3->y + dy, fobj.v3->z + dz);
-
+			*/
 			f = Face(pa, pb, pc);
 
 			ok = pointIn(par, f);
@@ -921,9 +987,9 @@ int main(int argc, char** argv)
 	//mainMenu(4);
 
 	glutCreateWindow("Hello World");
-	//glutInitWindowSize(800, 600);
+	glutInitWindowSize(800, 600);
 
-	glutFullScreen();
+	//glutFullScreen();
 
 	glutDisplayFunc(display);
 

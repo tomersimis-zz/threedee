@@ -114,7 +114,7 @@ Vector Vector::rotate(double angle, int type){
 		rotMatrix[1][1] = cos(angle);
 		rotMatrix[1][2] = -sin(angle);
 		rotMatrix[2][1] = sin(angle);
-		rotMatrix[2][1] = cos(angle);
+		rotMatrix[2][2] = cos(angle);
 	}
 	if (type == 1) {
 		rotMatrix[0][0] = cos(angle);
@@ -129,8 +129,8 @@ Vector Vector::rotate(double angle, int type){
 		rotMatrix[1][1] = cos(angle);
 	}
 	double dx = 0, dy = 0, dz = 0;
-	dx = rotMatrix[0][0] * this->x + rotMatrix[0][1] * this->y + rotMatrix[0][2] * this->z;
-	dy = rotMatrix[1][0] * this->x + rotMatrix[1][1] * this->y + rotMatrix[1][2] * this->z;
-	dx = rotMatrix[2][0] * this->x + rotMatrix[2][1] * this->y + rotMatrix[2][2] * this->z;
+	dx = (rotMatrix[0][0] * (this->x)) + (rotMatrix[0][1] * (this->y)) + (rotMatrix[0][2] * (this->z));
+	dy = (rotMatrix[1][0] * (this->x)) + (rotMatrix[1][1] * (this->y)) + (rotMatrix[1][2] * (this->z));
+	dz = (rotMatrix[2][0] * (this->x)) + (rotMatrix[2][1] * (this->y)) + (rotMatrix[2][2] * (this->z));
 	return Vector(dx, dy, dz);
 }
