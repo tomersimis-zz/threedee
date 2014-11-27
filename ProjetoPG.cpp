@@ -15,6 +15,7 @@
 #include "Object.h"
 #include "Loader.h"
 #include "Camera.h"
+#include "Transform.h"
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -63,77 +64,33 @@ void drawCoordinateSystem(){
 	glEnd();
 }
 
-void translate(double x, double y, double z){
-	double translationMatrix[16] = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		x, y, z, 1
-	};
-	glMultMatrixd(translationMatrix);
-}
-
-void scale(double scale){
-	double scaleMatrix[16] = {
-		scale, 0, 0, 0,
-		0, scale, 0, 0,
-		0, 0, scale, 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(scaleMatrix);
-}
-
-void rotateZ(double angle){
-	double rotateZMatrix[16] = {
-		cos(angle), sin(angle), 0, 0,
-		-sin(angle), cos(angle), 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(rotateZMatrix);
-}
-
-void rotateY(double angle){
-	double rotateYMatrix[16] = {
-		cos(angle), 0, sin(angle), 0,
-		0, 1, 0, 0,
-		-sin(angle), 0, cos(angle), 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(rotateYMatrix);
-}
-
-void rotateX(double angle){
-	double rotateXMatrix[16] = {
-		1, 0, 0, 0,
-		0, cos(angle), sin(angle), 0,
-		0, -sin(angle), cos(angle), 0,
-		0, 0, 0, 1
-	};
-	glMultMatrixd(rotateXMatrix);
-}
-
 void drawColorPicker(){
-	/*glBegin(GL_QUADS);
-	glColor3f(1, 0, 0);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, glutGet(GLUT_WINDOW_HEIGHT) - 100, 0); // top left
-	glColor3f(0, 1, 0);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT) - 100, 0.0); // top right
-	glColor3f(0, 0, 1);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) -100, glutGet(GLUT_WINDOW_HEIGHT), 0.0); // bot left
-	glColor3f(1, 1, 1);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), 0.0); // bot right
-	glEnd();*/
 
-	glBegin(GL_QUADS);
-	glColor3f(1, 0, 0);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100,0, 0); // top left
-	glColor3f(0, 1, 0);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 100, 0.0); // top right
-	glColor3f(0, 0, 1);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 0, 0.0); // bot left
+	glBegin(GL_TRIANGLES);
 	glColor3f(1, 1, 1);
-	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 100, 0.0); // bot right
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 105, 105, 0); // top left
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 105, 0, 0); // bot left
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 105, 0); // top right
+
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 105, 0); // top right
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 0, 0); // bot right
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 105, 0, 0); // bot left
+
+	glColor3f(1, 0, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 100, 0); // top left
+	glColor3f(0, 1, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 0, 0); // bot left
+	glColor3f(0, 0, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 100, 0); // top right
+
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 100, 0); // top right
+
+	glColor3f(1, 1, 1);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH), 0, 0); // bot right
+
+	glColor3f(0, 1, 0);
+	glVertex3f(glutGet(GLUT_WINDOW_WIDTH) - 100, 0, 0); // bot left
+
 	glEnd();
 }
 
@@ -160,23 +117,34 @@ void display(){
 	for (int i = 0; i < objects.size(); i++){
 		glPushMatrix();
 
-		translate(objects[i].translationX, objects[i].translationY, objects[i].translationZ);
+		double translationMatrix[16];
+		Transform::translate(objects[i].translationX, objects[i].translationY, objects[i].translationZ, translationMatrix);
+		glMultMatrixd(translationMatrix);
 
+		double rotationXMatrix[16];
+		Transform::rotateX(objects[i].rotationX, rotationXMatrix);
+		glMultMatrixd(rotationXMatrix);
 
-		rotateX(objects[i].rotationX);
-		rotateY(objects[i].rotationY);
-		rotateZ(objects[i].rotationZ);
+		double rotationYMatrix[16];
+		Transform::rotateY(objects[i].rotationY, rotationYMatrix);
+		glMultMatrixd(rotationYMatrix);
 
-		scale(objects[i].scale);
+		double rotationZMatrix[16];
+		Transform::rotateZ(objects[i].rotationZ, rotationZMatrix);
+		glMultMatrixd(rotationZMatrix);
+
+		double scaleMatrix[16];
+		Transform::scale(objects[i].scale, scaleMatrix);
+		glMultMatrixd(scaleMatrix);
 
 		int index;
 		glBegin(GL_TRIANGLES);
 		for (int j = 0; j < objects[i].faces.size(); j++){
-#ifdef DRAW_NORMAL
-			index = objects[i].faces[j]->v1->index;
-			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
-			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
-#endif
+			#ifdef DRAW_NORMAL
+				index = objects[i].faces[j]->v1->index;
+				glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
+				glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
+			#endif
 
 			index = objects[i].faces[j]->v2->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
@@ -201,7 +169,7 @@ void display(){
 
 	glPopMatrix();
 
-
+	glDisable(GL_LIGHTING);
 
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -219,6 +187,7 @@ void display(){
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 
+	glEnable(GL_LIGHTING);
 
 	glutSwapBuffers();
 
