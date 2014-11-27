@@ -53,6 +53,9 @@ float near = 0.1;
 
 int selectedObject = 0;
 
+int windowWidth;
+int windowHeight;
+
 void drawCoordinateSystem(){
 
 	glDisable(GL_LIGHTING);
@@ -176,16 +179,20 @@ void drawObjects(){
 	}
 }
 
-void drawCube(float x, float y, float z)
+void drawCamera(float x, float y, float z)
 {
+
+	glColor3d(1.0, 1.0, 0.0);
+
 	glPushMatrix();
+	
 	glTranslatef(x, y, z);
 	glScaled(-1, -1, -1);
 	glRotated(camera.yawAngle, 0, 1, 0);
 	glRotated(-camera.pitchAngle, 1, 0, 0);
 	
 	GLUquadricObj *quadratic = gluNewQuadric();
-	gluCylinder(quadratic, 1, 1, 10, 32, 32);
+	gluCylinder(quadratic, 1, 1, 3, 32, 32);
 
 	glPopMatrix();
 
@@ -196,48 +203,25 @@ void drawCube(float x, float y, float z)
 	
 	glScaled(3, 3,3);
 
-	glBegin(GL_QUADS);
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, -1.0f);
-
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-
-	glVertex3f(-1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, -1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-
-	glVertex3f(-1.0f, 1.0f, -1.0f);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, 1.0f);
-	glVertex3f(1.0f, 1.0f, -1.0f);
-	glEnd();
+	glutSolidCube(1);
 
 	glPopMatrix();
 }
 
 void display(){
 
+	float aspect;
 	if (director){
+		aspect = (float)(windowWidth / 2) / (float)(windowHeight);
 		glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT));
 	}else{
+		aspect = (float)windowWidth / (float)(windowHeight);
 		glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	}
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
 	
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -291,7 +275,7 @@ void display(){
 		drawObjects();
 
 		glColor3d(1.0, 0.0, 0.0);
-		drawCube(camera.position.x, camera.position.y, camera.position.z);
+		drawCamera(camera.position.x, camera.position.y, camera.position.z);
 
 	}
 	glutSwapBuffers();
@@ -328,15 +312,25 @@ void setLightning(){
 
 void reshape(int w, int h){
 
+	windowWidth = w;
+	windowHeight = h;
+
 	#ifdef DEBUG
 		printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
 	#endif
+
+	float aspect;
+	if (director) {
+		aspect = (float)(w/2) / (float)(h/2);
+	}else{
+		aspect = (float)w / (float)h ;
+	}
 	
 	
 	glViewport(w/2, 0, w/2, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
+	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
 
 	setLightning();
 }

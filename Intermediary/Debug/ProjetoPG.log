@@ -3,9 +3,9 @@ C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.target
   ProjetoPG.cpp
 c:\users\tomer simis\desktop\threedee\projetopg.cpp(20): warning C4005: '_CRT_SECURE_NO_WARNINGS' : macro redefinition
           command-line arguments :  see previous definition of '_CRT_SECURE_NO_WARNINGS'
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(132): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(157): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(600): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(604): warning C4018: '<' : signed/unsigned mismatch
-c:\users\tomer simis\desktop\threedee\projetopg.cpp(608): warning C4018: '<' : signed/unsigned mismatch
+c:\users\tomer simis\desktop\threedee\projetopg.cpp(135): warning C4018: '<' : signed/unsigned mismatch
+c:\users\tomer simis\desktop\threedee\projetopg.cpp(160): warning C4018: '<' : signed/unsigned mismatch
+c:\users\tomer simis\desktop\threedee\projetopg.cpp(594): warning C4018: '<' : signed/unsigned mismatch
+c:\users\tomer simis\desktop\threedee\projetopg.cpp(598): warning C4018: '<' : signed/unsigned mismatch
+c:\users\tomer simis\desktop\threedee\projetopg.cpp(602): warning C4018: '<' : signed/unsigned mismatch
   ProjetoPG.vcxproj -> C:\Users\Tomer Simis\Desktop\threedee\.\Output\Debug\ProjetoPG.exe
