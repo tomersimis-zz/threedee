@@ -4,6 +4,15 @@
 //#define READ_TEXTURE
 //#define DBG
 //#define DBG_PARSE_FACE
+
+//NORMAL
+#define DEFAULT_ZERO_NORMAL // Toda normal começa com 0
+#define ADD_REMAINING_NORMAL //Adiciona uam normal com 0,0,0 até preencher o numero de vertices
+
+//Increment
+#define INCREMENT_VERTEX
+int NEXT_VERTEX;
+
 #define DBG_REPPORT
 #define IGNORE_NO_TYPE
 #define VERIFY_ERROR
@@ -104,9 +113,9 @@ int Loader::findPatternFace(int len) {
 		}
 	}
 
-	if (found) { 
+	if (found) {
 		if (cntSlash > 9) return 5;
-		return 3; 
+		return 3;
 	}
 	return 4;
 }
@@ -132,14 +141,17 @@ void Loader::parseFace(int pattern){
 	int cont = 0;
 	bool norm = 0;
 	long long int num;
-	if (pattern == 1 || pattern == 4 || pattern == 2  ){
+	if (pattern == 1 || pattern == 4 || pattern == 2){
 		for (int i = 1; i < len; i++){
 			if (strParse[i] >= '0' && strParse[i] <= '9') {
 				for (int j = i; j< len; j++){
 					if (j + 1 >= len || strParse[j + 1] == 32 || strParse[j + 1] == '/') {
 						num = parseInt(i, j);
 						num--; // INDEX by >=1
-						if (num < points->size()) paux = points->at(num);
+						if (num < points->size()) {
+							paux = points->at(num);
+
+						}
 						if (num < vectors->size()) naux = vectors->at(num);
 #ifdef  DBG_PARSE_FACE
 						printf("NUM >%lld  |  %lf %lf %lf\n", num, paux.x, paux.y, paux.z);
@@ -153,6 +165,7 @@ void Loader::parseFace(int pattern){
 								pa.x = paux.x;
 								pa.y = paux.y;
 								pa.z = paux.z;
+								pa.index = paux.index;
 								if (!(pattern == 2)) cont++;
 								norm = 1;
 							}
@@ -167,6 +180,7 @@ void Loader::parseFace(int pattern){
 								pb.x = paux.x;
 								pb.y = paux.y;
 								pb.z = paux.z;
+								pb.index = paux.index;
 								if (!(pattern == 2)) cont++;
 								norm = 1;
 							}
@@ -182,6 +196,7 @@ void Loader::parseFace(int pattern){
 								pc.x = paux.x;
 								pc.y = paux.y;
 								pc.z = paux.z;
+								pc.index = paux.index;
 								if (!(pattern == 2)) cont++;
 								norm = 1;
 							}
@@ -202,7 +217,10 @@ void Loader::parseFace(int pattern){
 #ifdef  DBG_PARSE_FACE	
 			printf("adding face -> %lf %lf %lf ||  %lf %lf %lf ||  %lf %lf %lf \n", face.v1->x, face.v1->y, face.v1->z, face.v2->x, face.v2->y, face.v2->z, face.v3->x, face.v3->y, face.v3->z);
 #endif
+
+
 			faces->push_back(Face(pa, pb, pc));
+
 		}
 		if (pattern == 2) {
 #ifdef  DBG_PARSE_FACE		
@@ -210,6 +228,7 @@ void Loader::parseFace(int pattern){
 			printf("NORMAL -> %lf %lf %lf | %lf %lf %lf | %lf %lf %lf\n", na.x, na.y, na.z, nb.x, nb.y, nb.z, nc.x, nc.y, nc.z);
 #endif
 			faces->push_back(Face(pa, pb, pc, na, nb, nc));
+
 #ifdef  DBG_PARSE_FACE			
 			face = faces->at(int(faces->size()) - 1);
 			printf("NORMAL ADDED-> %lf %lf %lf | %lf %lf %lf | %lf %lf %lf\n", na.x, na.y, na.z, nb.x, nb.y, nb.z, nc.x, nc.y, nc.z);
@@ -220,13 +239,15 @@ void Loader::parseFace(int pattern){
 #ifdef  DBG_PARSE_FACE	
 	printf("FIM -> %lf %lf %lf ||  %lf %lf %lf ||  %lf %lf %lf \n", face.v1->x, face.v1->y, face.v1->z, face.v2->x, face.v2->y, face.v2->z, face.v3->x, face.v3->y, face.v3->z);
 #endif 
+
 }
 
 int Loader::load() {
-	PATTERN_3=0;
-	COMMENTS=0;
-	NO_TYPE_FLAG=0;
-	UNRECORNIZED_PATTERNS=0;
+	NEXT_VERTEX = 0;
+	PATTERN_3 = 0;
+	COMMENTS = 0;
+	NO_TYPE_FLAG = 0;
+	UNRECORNIZED_PATTERNS = 0;
 	UNRECOGNIZED_LINES.clear();
 
 	string x; int l, t;
@@ -238,7 +259,7 @@ int Loader::load() {
 	Point point;
 	int ERROR = NO_ERROR;
 #ifdef DBG_REPPORT
-	printf("[Loader Report] Iniciando leitura do arquivo: %s /n", (*path ).c_str());
+	printf("[Loader Report] Iniciando leitura do arquivo: %s /n", (*path).c_str());
 #endif
 	ifstream file((*(path)).c_str());
 	if (file.is_open()) {
@@ -252,7 +273,7 @@ int Loader::load() {
 #ifdef DBG
 			cout << "Linha[" << lineCount << "]: " << line << endl;
 #endif
-			LABEL_INICIO_LEITURA:;
+		LABEL_INICIO_LEITURA:;
 
 			len = line.length();
 			if (!len) continue;
@@ -297,7 +318,7 @@ int Loader::load() {
 				ERROR = NO_TYPE_FOUND;
 				goto LABEL_ERROR;
 #endif
-				
+
 				continue;
 			}
 			if (TYPE == VERTICE || TYPE == NORMAL) {
@@ -356,6 +377,10 @@ int Loader::load() {
 #ifdef DBG
 					printf("Adding point %lf %lf %lf\n", point.x, point.y, point.z);
 #endif 
+
+#ifdef INCREMENT_VERTEX
+					point.index = NEXT_VERTEX++;
+#endif 
 					points->push_back(point);
 				}
 				if (TYPE == NORMAL) {
@@ -363,8 +388,14 @@ int Loader::load() {
 					if (cont == 3) normal.z = point.z;
 #ifdef DBG
 					printf("Adding normal %lf %lf\n", normal.x, normal.y);
-#endif 					
+#endif 				
+
+#ifdef DEFAULT_ZERO_NORMAL
+					normal.x = normal.y = normal.z = 0;
+#endif 
+
 					vectors->push_back(normal);
+
 				}
 			}
 			else if (TYPE == FACE) {
@@ -372,17 +403,17 @@ int Loader::load() {
 				printf("ENTROU FACE FIND : %s\n", strParse.c_str());
 #endif 
 				int pattern = findPatternFace(len);
-				if(pattern == 3) PATTERN_3=1;
-				if (pattern >= 5 || pattern == 3) { 
-					UNRECORNIZED_PATTERNS++; 
+				if (pattern == 3) PATTERN_3 = 1;
+				if (pattern >= 5 || pattern == 3) {
+					UNRECORNIZED_PATTERNS++;
 					if (UNRECOGNIZED_LINES.size() < 5) UNRECOGNIZED_LINES.push_back(lineCount);
-					
+
 				}
 #ifdef DBG
 				printf("ENCONTROU APTTEND %d : %s\n", pattern, strParse.c_str());
 #endif
 
-				
+
 				parseFace(pattern);
 
 			}
@@ -390,7 +421,7 @@ int Loader::load() {
 			int find = 0;
 			int posCont = 0;
 			for (int i = 0; i < len; i++){
-				if (line[i] == 'v' || line[i] == 'f' || line[i] == 'vn' || line[i] == 'vt'  ){
+				if (line[i] == 'v' || line[i] == 'f' || line[i] == 'vn' || line[i] == 'vt'){
 					if (find) {
 						posCont = i;
 						find++; break;
@@ -399,7 +430,7 @@ int Loader::load() {
 				}
 			}
 			if (find >= 2){
-				line = line.substr(posCont, len-posCont+1);
+				line = line.substr(posCont, len - posCont + 1);
 				goto LABEL_INICIO_LEITURA;
 			}
 
@@ -435,18 +466,35 @@ LABEL_ERROR:;
 		cout << "[Loader Statistics] Vectors: " << int(vectors->size()) << endl;
 		cout << "[Loader Statistics] Faces: " << int(faces->size()) << endl;
 		cout << "[Loader Statistics] Comment lines: " << COMMENTS << endl;
-		if (NO_TYPE_FLAG) cout << "[Loader Warning] Your .obj contains lines whitout recognized type, count:" <<  NO_TYPE_FLAG <<endl;
+#ifdef ADD_REMAINING_NORMAL
+		int diff = points->size() - vectors->size();
+
+		for (int i = 0; i < diff; i++){
+			vectors->push_back(Vector(0, 0, 0));
+		}
+		if (diff < 0)diff = 0;
+		cout << "[Loader Statistics] Added more : " << diff << " zero normals." << endl;
+
+#endif 
+
+
+		if (NO_TYPE_FLAG) cout << "[Loader Warning] Your .obj contains lines whitout recognized type, count:" << NO_TYPE_FLAG << endl;
 		if (PATTERN_3)  cout << "[Loader Warning] Your .obj contains lines in pattern: 1/1/1 1/1/1 1/1/1, unplemented yet." << endl;
 		if (UNRECORNIZED_PATTERNS > 0) {
 			cout << "[Loader Warning] Your .obj contains lines with unrecognized patterns, maybe something with more then 3 points and normals, check these first ones lines in .obj: " << endl;
-			for (int i = 0; i < UNRECOGNIZED_LINES.size(); i++) { 
+			for (int i = 0; i < UNRECOGNIZED_LINES.size(); i++) {
 				printf("%d", UNRECOGNIZED_LINES[i]);
-				if (i != UNRECOGNIZED_LINES.size() - 1) printf(", " );
-			 }
+				if (i != UNRECOGNIZED_LINES.size() - 1) printf(", ");
+			}
 			cout << endl;
 		}
+
+
+
 		//	#endif 
 	}
+
+
 
 	file.close();
 	cout << "[Loader Report] File closed with sucess." << endl;

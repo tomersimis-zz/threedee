@@ -169,16 +169,21 @@ void display(){
 
 		scale(objects[i].scale);
 
+		int index;
 		glBegin(GL_TRIANGLES);
-
 		for (int j = 0; j < objects[i].faces.size(); j++){
-			//printf("\nChegou 2\n");
 #ifdef DRAW_NORMAL
-			glNormal3d(objects[i].faces[j]->fn->x, objects[i].faces[j]->fn->y, objects[i].faces[j]->fn->z);
-#endif
-			//printf("Chegou 1\n");
+			index = objects[i].faces[j]->v1->index;
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
 			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
+#endif
+
+			index = objects[i].faces[j]->v2->index;
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
 			glVertex3d(objects[i].faces[j]->v2->x, objects[i].faces[j]->v2->y, objects[i].faces[j]->v2->z);
+
+			index = objects[i].faces[j]->v3->index;
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
 			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
 		}
 		glEnd();
@@ -524,6 +529,7 @@ void mainMenu(int item){
 	printf("Criando o novo objeto . . ./n");
 	Object newObject = Object(vertex, faces, normals);
 	newObject.calculateNormals();
+	newObject.calculateVertexNormals();
 	printf("Calculando as normais . . ./n");
 	objects.push_back(newObject);
 	printf("Inserindo o objeto . . ./n");
