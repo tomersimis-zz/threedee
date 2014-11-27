@@ -25,6 +25,10 @@ class Face{
 		Face(Point a, Point b, Point c, Vector d, Vector e, Vector f);
 		Face(Point* v1, Point* v2, Point* v3, Vector *fn);
 		void calculateNormal();
+		double R;
+		double G;
+		double B;
+		Point centroid();
 
 };
 #endif

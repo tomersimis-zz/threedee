@@ -21,11 +21,12 @@ class Vector{
 		void add(Point *p);
 		void subtract(Vector v);
 		static Vector cross(Vector v1, Vector v2);
-		long long int dotProduct(Vector v);
+		double dotProduct(Vector v);
 		void multitplyScalar(int k);
 		double norm();
 		double angleBetween(Vector v);
 		double dot(Vector v);
+		Vector rotate(double angle, int type);
 
 
 };

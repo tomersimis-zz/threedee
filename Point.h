@@ -13,6 +13,8 @@ class Point{
 		Point(double x, double y, double z, int index);
 		Point();
 		void sum(double x, double y, double z);
+		double distanceFrom(Point a);
+		Point rotate(double angle, int type);
 };
 
 #endif

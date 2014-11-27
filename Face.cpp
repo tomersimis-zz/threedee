@@ -5,6 +5,7 @@ Face::Face(Point* v1, Point* v2, Point* v3){
 	this->v2 = v2;
 	this->v3 = v3;
 	//printf("Construtor 5/n");
+	this->R = 1;  this->G = this->B = 0;
 }
 
 Face::Face(Point* v1, Point* v2, Point* v3, Vector* n1, Vector* n2, Vector* n3){
@@ -16,6 +17,7 @@ Face::Face(Point* v1, Point* v2, Point* v3, Vector* n1, Vector* n2, Vector* n3){
 	this->n3 = n3;
 	this->fn = new Vector(0, 0, 0);
 	//printf("Construtor 4/n");
+	this->R = 1;  this->G = this->B = 0;
 }
 
 Face::Face(){
@@ -28,6 +30,7 @@ Face::Face(){
 	v3->x = 0, v3->y = 0, v3->z = 0;
 	this->fn = new Vector(0, 0, 0);
 	//	printf("Construtor 6/n"); 
+	this->R = 1;  this->G = this->B = 0;
 }
 
 Face::Face(Point a, Point b, Point c){
@@ -49,6 +52,7 @@ Face::Face(Point a, Point b, Point c){
 	n2 = (Vector*)malloc(1 * sizeof(Vector));
 	n3 = (Vector*)malloc(1 * sizeof(Vector));
 	this->fn = new Vector(0, 0, 0);
+	this->R = 1;  this->G = this->B = 0;
 
 }
 
@@ -75,6 +79,7 @@ Face::Face(Point a, Point b, Point c, Vector d, Vector e, Vector f){
 	n3->z = f.z;
 	// printf("Construtor 2/n");
 	this->fn = new Vector(0, 0, 0);
+	this->R = 1;  this->G = this->B = 0;
 }
 
 Face::Face(Point* v1, Point* v2, Point* v3, Vector* fn){
@@ -83,6 +88,7 @@ Face::Face(Point* v1, Point* v2, Point* v3, Vector* fn){
 	this->v3 = v3;
 	this->fn = fn;
 	//printf("Construtor 3/n");
+	this->R = 1;  this->G = this->B = 0;
 }
 
 void Face::calculateNormal(){
@@ -122,4 +128,11 @@ void Face::calculateNormal(){
 		fn->y /= len;
 		fn->z /= len;
 	}
+}
+
+Point Face::centroid(){
+	double dx = (this->v1->x + this->v2->x + this->v3->x) / 3.0;
+	double dy = (this->v1->y + this->v2->y + this->v3->y) / 3.0;
+	double dz = (this->v1->z + this->v2->z + this->v3->z) / 3.0;
+	return Point(dx, dy, dz);
 }

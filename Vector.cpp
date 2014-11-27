@@ -72,7 +72,7 @@ Vector Vector::cross(Vector v1, Vector v2){
 	return Vector(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x);
 }
 
-long long int Vector::dotProduct(Vector v){
+double Vector::dotProduct(Vector v){
 	return (this->x * (v.x)) + (this->y * (v.y)) + (this->z * (v.z));
 }
 
@@ -100,4 +100,37 @@ double  Vector::angleBetween(Vector v){
 
 double Vector::dot(Vector v){
 	return this->x*v.x + this->y*v.y + this->z*v.z;
+}
+
+
+
+Vector Vector::rotate(double angle, int type){
+	double rotMatrix[3][3] = {
+		{ 1, 0, 0 },
+		{ 0, 1, 0 },
+		{ 0, 0, 1 }
+	};
+	if (type == 0){
+		rotMatrix[1][1] = cos(angle);
+		rotMatrix[1][2] = -sin(angle);
+		rotMatrix[2][1] = sin(angle);
+		rotMatrix[2][1] = cos(angle);
+	}
+	if (type == 1) {
+		rotMatrix[0][0] = cos(angle);
+		rotMatrix[0][2] = sin(angle);
+		rotMatrix[2][0] = -sin(angle);
+		rotMatrix[2][2] = cos(angle);
+	}
+	if (type == 2) {
+		rotMatrix[0][0] = cos(angle);
+		rotMatrix[0][1] = -sin(angle);
+		rotMatrix[1][0] = sin(angle);
+		rotMatrix[1][1] = cos(angle);
+	}
+	double dx = 0, dy = 0, dz = 0;
+	dx = rotMatrix[0][0] * this->x + rotMatrix[0][1] * this->y + rotMatrix[0][2] * this->z;
+	dy = rotMatrix[1][0] * this->x + rotMatrix[1][1] * this->y + rotMatrix[1][2] * this->z;
+	dx = rotMatrix[2][0] * this->x + rotMatrix[2][1] * this->y + rotMatrix[2][2] * this->z;
+	return Vector(dx, dy, dz);
 }

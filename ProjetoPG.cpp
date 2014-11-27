@@ -155,9 +155,17 @@ void drawObjects(){
 		Transform::scale(objects[i].scale, scaleMatrix);
 		glMultMatrixd(scaleMatrix);
 
+		double R, G, B;
+
 		int index;
-		glBegin(GL_TRIANGLES);
+		
 		for (int j = 0; j < objects[i].faces.size(); j++){
+			R = objects[i].faces[j]->R;
+			G = objects[i].faces[j]->G;
+			B = objects[i].faces[j]->B;
+			glColor3f(R, G, B);
+			glBegin(GL_TRIANGLES);
+
 			#ifdef DRAW_NORMAL
 			index = objects[i].faces[j]->v1->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
@@ -171,8 +179,10 @@ void drawObjects(){
 			index = objects[i].faces[j]->v3->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
 			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
+		
+			glEnd();
 		}
-		glEnd();
+		
 
 		glPopMatrix();
 
@@ -616,6 +626,129 @@ void mainMenu(int item){
 	printf(" READY! \n");
 }
 
+
+int rayIntersectsTriangle(Point p, Vector d,
+	Point v0, Point v1, Point v2) {
+	float e1[3], e2[3], h[3], s[3], q[3];
+	Vector E1 = Vector(v1, v0);
+	Vector E2 = Vector(v2, v0);
+	Vector H = E2.cross(d, E2);
+	double A = E1.dotProduct(H);
+	if (A > -0.00001 && A < 0.00001) return 0;
+	double F = 1.0 / A;
+	Vector S = Vector(p, v0);
+	double U = F * (S.dotProduct(H));
+	if (U < 0.0 || U > 1.0) return 0;
+	Vector Q = S.cross(S, E1);
+	double V = F * d.dotProduct(Q);
+	if (V < 0.0 || U + V > 1.0) return 0;
+	// achando t 
+	double T = F * E2.dotProduct(Q);
+	if (T > 0.00001) return 1; // intereseção de raio
+	else return 0; // intereseção de linha mas não de raio
+}
+
+pair<Point, Point> fromScreenToWorld(int winX, int winY){
+	double winZ;
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLint viewport[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	double resX, resY, resZ, res2X, res2Y, res2Z;
+	winY = viewport[3] - winY;
+	winZ = near;
+	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &resX, &resY, &resZ);
+	printf("Resultado: %lf %lf %lf\n", resX, resY, resZ);
+	winZ = 500;
+	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &res2X, &res2Y, &res2Z);
+	printf("Resultado: %lf %lf %lf\n", res2X, res2Y, res2Z);
+	return (make_pair(Point(resX, resY, resZ), Point(res2X, res2Y, res2Z)));
+}
+
+bool pointIn(pair<Point, Point> par, Face f){
+	Point pa = par.first, pb = par.second;
+	Vector dir = Vector(pa, pb);
+	Point v0 = *(f.v1);
+	Point v1 = *(f.v2);
+	Point v2 = *(f.v3);
+	return rayIntersectsTriangle(pa, dir, v0, v1, v2);
+}
+
+
+void paintFace(pair<Point, Point> par){
+	printf("Camera---> %lf %lf %lf\n", camera.position.x, camera.position.y, camera.position.z);
+	Face f, fobj;
+	double R = 0.5, G = 0.5, B = 0.5;
+	bool ok;
+	pair<int, int> index; // first == object, second == face;
+	bool found = 0;
+	double minDist = 0x3f3f3f, tx, ty, tz, dx, dy, dz, angleX, angleY, angleZ;
+	for (int i = 0; i < objects.size(); i++){
+		dx = objects[i].translationX;
+		dy = objects[i].translationY;
+		dz = objects[i].translationZ;
+		angleX = objects[i].rotationX;
+		angleY = objects[i].rotationY;
+		angleZ = objects[i].rotationZ;
+
+		for (int j = 0; j < objects[i].faces.size(); j++){
+			fobj = *(objects[i].faces[j]);
+			Point pa, pb, pc;
+			pa = *(fobj.v1);
+			/*
+			pa = pa.rotate(angleX, 0);
+			pa = pa.rotate(angleY, 1);
+			pa = pa.rotate(angleZ, 2);
+
+			pb = fobj.v2->rotate(angleX, 0);
+			pb = pb.rotate(angleY, 1);
+			pb = pb.rotate(angleZ, 2);
+
+			pc = fobj.v3->rotate(angleX, 0);
+			pc = pc.rotate(angleY, 1);
+			pc = pc.rotate(angleZ, 2);
+			*/
+
+			pa = Point(fobj.v1->x + dx, fobj.v1->y + dy, fobj.v1->z + dz);
+			pb = Point(fobj.v2->x + dx, fobj.v2->y + dy, fobj.v2->z + dz);
+			pc = Point(fobj.v3->x + dx, fobj.v3->y + dy, fobj.v3->z + dz);
+
+			f = Face(pa, pb, pc);
+
+			ok = pointIn(par, f);
+			if (ok){
+				found = 1;
+
+				Point centro = f.centroid();
+
+
+				double distCentroid = camera.position.distanceFrom(centro);
+				//double distCentroid = camera.position.distanceFrom( *(f.v1)  );
+				printf("Encontrou! Centroid: %lf %lf %lf   || Distance: %lf e minDist: %lf  \n", centro.x, centro.y, centro.z, distCentroid, minDist);
+				if (distCentroid < minDist) {
+					minDist = distCentroid;
+					index.first = i, index.second = j;
+					printf("Melhor: (%d, %d) -- Dist: %lf\n", i, j, minDist);
+				}
+			}
+		}
+	}
+	if (found){
+
+		int i = index.first, j = index.second;
+		printf("Face index: %d %d\n", i, j);
+		objects[i].faces[j]->R = R;
+		objects[i].faces[j]->G = G;
+		objects[i].faces[j]->B = B;
+	}
+
+
+}
+
+bool CLICKED = 0;
+
 void mousePress(int btn, int state, int x, int y){
 	if (btn == GLUT_LEFT_BUTTON){
 
@@ -624,6 +757,17 @@ void mousePress(int btn, int state, int x, int y){
 			picking = false;
 		}
 		else{
+
+			if (!CLICKED){
+				printf("Em tela: %d %d\n", x, y);
+				double winX = x, winY = y, winZ;
+				pair<Point, Point> par = fromScreenToWorld(x, y);
+				paintFace(par);
+				CLICKED = 0;
+			}
+			else CLICKED = 1;
+
+
 			drag = false;
 			if (colorPicker && x > glutGet(GLUT_WINDOW_WIDTH) - 120 && y > glutGet(GLUT_WINDOW_HEIGHT) - 120){ // picking a color
 				picking = true;
@@ -661,10 +805,12 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
 	mainMenu(1);
-	mainMenu(4);
+	//mainMenu(4);
 
 	glutCreateWindow("Hello World");
-	glutFullScreen();
+	glutInitWindowSize(800, 600);
+
+	//glutFullScreen();
 
 	glutDisplayFunc(display);
 
