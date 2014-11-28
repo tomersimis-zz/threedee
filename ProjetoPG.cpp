@@ -17,6 +17,8 @@
 #include "Camera.h"
 #include "Transform.h"
 
+#define MATERIALS_NUMBER 12
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #define DRAW_NORMAL
@@ -24,6 +26,7 @@
 #define DEBUG
 
 #define EPS 1e-9
+#define EPS_CMP_DOUBLE 1e-5
 
 
 std::vector<Object> objects;
@@ -41,9 +44,16 @@ bool director = false;
 
 bool directorClicked = false;
 
-bool colorPicker = false;
 
+// COLOR PICKER 
+int CURR_OBJECT_PAINT_ALL;
+int CURR_MATERIAL;
+bool FOUND_OBJECT_PAINT_ALL;
+bool HAS_PAINT_ALL_OBJECT;
+bool PAINT_ALL_FLAG;
+bool colorPicker = false;
 bool picking = false;
+bool CHANGED_COLOR;
 
 bool drag;
 Point* mousePosition;
@@ -55,19 +65,19 @@ bool enable = false;
 
 float near = 0.1;
 
-bool PAINT_ALL_FLAG;
+
 
 
 int selectedObject = 0;
 
-int NEXT_INDEX; 
+int NEXT_INDEX;
 
 int windowWidth;
 int windowHeight;
 
 void setLightning();
 void drawCoordinateSystem();
-void drawSquare(); 
+void drawSquare();
 void drawColorPicker();
 void drawObjects();
 void drawCamera();
@@ -81,24 +91,34 @@ void paintFace();
 void mousePress();
 void mouseMove();
 
-GLfloat MATERIALS_AMBIENT[7][3] = {
-		{ 0.25, 1, 0.25 },
-		{ 0, 1, 0.5 },
-		{ 0.3, 0, 1 },
-		{ 0, 1, 1 },
-		{ 1, 0.5, 0.9 },
-		{ 0.8, 0.1, 0.35 },
-		{ 1, 0.8, 0 }
+GLfloat MATERIALS_AMBIENT[12][3] = {
+	{ (double)229 / 255, (double)24 / 255, 0 },
+	{ (double)127 / 255, (double)13 / 255, 0 },
+	{ (double)64 / 255, (double)7 / 255, 0 },
+	{ (double)14 / 255, (double)229 / 255, 0 },
+	{ (double)8 / 255, (double)127 / 255, 0 },
+	{ (double)4 / 255, (double)64 / 255, 0 },
+	{ 0, (double)9 / 255, (double)229 / 255 },
+	{ 0, (double)5 / 255, (double)227 / 255 },
+	{ 0, (double)2 / 255, (double)64 / 255 },
+	{ 0,    0    , 0},
+	{ 0.501961, 0.501961, 0.501961 },
+	{ 1, 1, 1 },
 };
 
-GLfloat MATERIALS_DIFFUSE[7][3] = {
-		{ 1, 1, 1 },
-		{ 0, 1, 0 },
-		{ 1, 0, 0 },
-		{ 0, 0, 1 },
-		{ 0.2, 0.5, 0.9 },
-		{ 0.8, 0.1, 0.35 },
-		{ 0.1, 0.5, 0.4 }
+GLfloat MATERIALS_DIFFUSE[12][3] = {
+	{ (double)229 / 255, (double)24 / 255, 0 },
+	{ (double)127 / 255, (double)13 / 255, 0 },
+	{ (double)64 / 255, (double)7 / 255, 0 },
+	{ (double)14 / 255, (double)229 / 255, 0 },
+	{ (double)8 / 255, (double)127 / 255, 0 },
+	{ (double)4 / 255, (double)64 / 255, 0 },
+	{ 0, (double)9 / 255, (double)229 / 255 },
+	{ 0, (double)5 / 255, (double)227 / 255 },
+	{ 0, (double)2 / 255, (double)64 / 255 },
+	{ 0, 0, 0 },
+	{ 0.501961, 0.501961, 0.501961 },
+	{ 1, 1, 1 },
 };
 
 void drawBoundingBox(int gridL){
@@ -335,24 +355,28 @@ void drawObjects(){
 		int index, materialIndex;
 		//int contador = 0;
 		for (int j = 0; j < objects[i].faces.size(); j++){
-			
-			if (PAINT_ALL_FLAG) {
-				//objects[i].faces[j]->materialIndex = NEXT_INDEX;
-				objects[i].faces[j]->materialIndex = 2;
-				
+		/*	int CURR_OBJECT_PAINT_ALL;
+			int CURR_MATERIAL;
+			bool FOUND_OBJECT_PAINT_ALL;
+			bool HAS_PAINT_ALL_OBJECT;
+			bool PAINT_ALL_FLAG;
+		*/
+			if (PAINT_ALL_FLAG && FOUND_OBJECT_PAINT_ALL && !HAS_PAINT_ALL_OBJECT && i == CURR_OBJECT_PAINT_ALL) {
+				objects[i].faces[j]->materialIndex = CURR_MATERIAL;
 			}
+
 
 			glBegin(GL_TRIANGLES);
 			materialIndex = objects[i].faces[j]->materialIndex;
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, MATERIALS_AMBIENT[materialIndex]);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MATERIALS_DIFFUSE[materialIndex]);
-			
-		
-			#ifdef DRAW_NORMAL
+
+
+#ifdef DRAW_NORMAL
 			index = objects[i].faces[j]->v1->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
 			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
-			#endif
+#endif
 
 			index = objects[i].faces[j]->v2->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
@@ -361,17 +385,20 @@ void drawObjects(){
 			index = objects[i].faces[j]->v3->index;
 			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
 			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
-		
+
 			glEnd();
 		}
-		if (PAINT_ALL_FLAG) {
-			PAINT_ALL_FLAG = 0;
-			NEXT_INDEX++; NEXT_INDEX %= 5;
-		}
+
 
 		glPopMatrix();
 
 	}
+
+
+	if (PAINT_ALL_FLAG && FOUND_OBJECT_PAINT_ALL && !HAS_PAINT_ALL_OBJECT ) {
+		HAS_PAINT_ALL_OBJECT = 1;
+	}
+
 }
 
 void drawGrid(){
@@ -436,7 +463,8 @@ void display(){
 	if (director){
 		aspect = (float)(windowWidth / 2) / (float)(windowHeight);
 		glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT));
-	}else{
+	}
+	else{
 		aspect = (float)windowWidth / (float)(windowHeight);
 		glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	}
@@ -444,7 +472,7 @@ void display(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
-	
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -471,7 +499,7 @@ void display(){
 
 	if (boundingBox)
 		drawBoundingBox(100);
-	
+
 	/* Coordinate system drawing */
 
 	drawCoordinateSystem();
@@ -541,25 +569,27 @@ void reshape(int w, int h){
 	windowWidth = w;
 	windowHeight = h;
 
-	#ifdef DEBUG
-		printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
-	#endif
+#ifdef DEBUG
+	printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
+#endif
 
 	float aspect;
 	if (director) {
-		aspect = (float)(w/2) / (float)(h/2);
-	}else{
-		aspect = (float)w / (float)h ;
+		aspect = (float)(w / 2) / (float)(h / 2);
 	}
-	
-	
-	glViewport(w/2, 0, w/2, h);
+	else{
+		aspect = (float)w / (float)h;
+	}
+
+
+	glViewport(w / 2, 0, w / 2, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
 
-	
+
 }
+
 
 
 char mode = 0; // 0 = obj, 1 = light
@@ -791,10 +821,13 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'p':
 	case 'P':
+
 		if (!PAINT_ALL_FLAG){
 			PAINT_ALL_FLAG = 1;
+			FOUND_OBJECT_PAINT_ALL = 0;
+			HAS_PAINT_ALL_OBJECT = 0;
 		}
-
+		else { PAINT_ALL_FLAG = 0; }
 		break;
 		break;
 	}
@@ -925,8 +958,6 @@ bool pointIn(pair<Point, Point> par, Face f){
 
 
 void paintFace(pair<Point, Point> par){
-	if (PAINT_ALL_FLAG) return;
-
 	printf("Camera---> %lf %lf %lf\n", camera.position.x, camera.position.y, camera.position.z);
 	Face f, fobj;
 	double R = 0.5, G = 0.5, B = 0.5;
@@ -973,72 +1004,20 @@ void paintFace(pair<Point, Point> par){
 		par.second = par.second.rotate(angleX, 0);
 		par.second = par.second.rotate(angleY, 1);
 		par.second = par.second.rotate(angleZ, 2);
-
-
-
-		//printf("Dx:%lf | DY: %lf  | DZ: %lf | scale: %lf | angle: %lf %lf %lf\n", dx, dy, dz, scale, angleX, angleY, angleZ);
-
 		for (int j = 0; j < objects[i].faces.size(); j++){
 			fobj = *(objects[i].faces[j]);
 			Point pa, pb, pc;
-
-
 			pa = *(fobj.v1);
 			pb = *(fobj.v2);
 			pc = *(fobj.v3);
-
 			pa = Point(pa.x, pa.y, pa.z);
 			pb = Point(pb.x, pb.y, pb.z);
 			pc = Point(pc.x, pc.y, pc.z);
-
-			/*
-			// Rotate
-			pa = pa.rotate(angleX, 0);
-			pa = pa.rotate( angleY, 1);
-			pa = pa.rotate( angleZ, 2);
-
-			pb = pb.rotate( angleX, 0);
-			pb = pb.rotate(angleY, 1);
-			pb = pb.rotate(angleZ, 2);
-
-			pc = pc.rotate( angleX, 0);
-			pc = pc.rotate( angleY, 1);
-			pc = pc.rotate( angleZ, 2);
-
-			//Translate
-			pa.x += dx;
-			pb.x += dx;
-			pc.x += dx;
-
-
-			pa.y += dy;
-			pb.y += dy;
-			pc.y += dy;
-
-			pa.z += dz;
-			pb.z += dz;
-			pc.z += dz;
-
-			//Scale
-			pa = pa.multiplyScalar(scale);
-			pb = pb.multiplyScalar(scale);
-			pc = pc.multiplyScalar(scale);
-
-			*/
-			/*
-			pa = Point(fobj.v1->x + dx, fobj.v1->y + dy, fobj.v1->z + dz);
-			pb = Point(fobj.v2->x + dx, fobj.v2->y + dy, fobj.v2->z + dz);
-			pc = Point(fobj.v3->x + dx, fobj.v3->y + dy, fobj.v3->z + dz);
-			*/
 			f = Face(pa, pb, pc);
-
 			ok = pointIn(par, f);
 			if (ok){
 				found = 1;
-
 				Point centro = f.centroid();
-
-
 				double distCentroid = camera.position.distanceFrom(centro);
 				//double distCentroid = camera.position.distanceFrom( *(f.v1)  );
 				printf("Encontrou! Centroid: %lf %lf %lf   || Distance: %lf e minDist: %lf  \n", centro.x, centro.y, centro.z, distCentroid, minDist);
@@ -1050,18 +1029,21 @@ void paintFace(pair<Point, Point> par){
 			}
 		}
 	}
-	if (found && !PAINT_ALL_FLAG){
+	if (found ){
 
-		int i = index.first, j = index.second;
-		printf("Face index: %d %d\n", i, j);
-
-		//objects[i].faces[j]->materialIndex = NEXT_INDEX;
-		objects[i].faces[j]->materialIndex = 2;
-		NEXT_INDEX++; NEXT_INDEX %= 5;
-
-		objects[i].faces[j]->R = R;
-		objects[i].faces[j]->G = G;
-		objects[i].faces[j]->B = B;
+		if (PAINT_ALL_FLAG){
+			CURR_OBJECT_PAINT_ALL = index.first;
+			FOUND_OBJECT_PAINT_ALL = 1;
+			HAS_PAINT_ALL_OBJECT = 0;
+		}
+		else { 
+			int i = index.first, j = index.second;
+			printf("Face index: %d %d\n", i, j);
+			objects[i].faces[j]->materialIndex = CURR_MATERIAL;
+			objects[i].faces[j]->R = R;
+			objects[i].faces[j]->G = G;
+			objects[i].faces[j]->B = B;
+		}
 
 	}
 
@@ -1069,6 +1051,20 @@ void paintFace(pair<Point, Point> par){
 }
 
 bool CLICKED = 0;
+
+int cmpDouble(double a, double b){
+	if (fabs(a - b) <= EPS_CMP_DOUBLE) return 0;
+	return  (a > b) ? 1 : -1;
+}
+
+int findMaterial(double r, double g, double b){
+	for (int i = 0; i < MATERIALS_NUMBER; i ++){
+		if (cmpDouble(r, MATERIALS_AMBIENT[i][0]) == 0 && cmpDouble(g, MATERIALS_AMBIENT[i][1]) == 0 && cmpDouble(b, MATERIALS_AMBIENT[i][2]) == 0 ) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 void mousePress(int btn, int state, int x, int y){
 	if (btn == GLUT_LEFT_BUTTON){
@@ -1100,17 +1096,33 @@ void mousePress(int btn, int state, int x, int y){
 				picking = true;
 
 				GLint viewport[4];
-				GLubyte pixel[3];
+				GLfloat pixel[3];
+				
+
+
 
 				glGetIntegerv(GL_VIEWPORT, viewport);
 
 				glReadPixels(x, viewport[3] - y, 1, 1,
-					GL_RGB, GL_UNSIGNED_BYTE, (void *)pixel);
+					GL_RGB, GL_FLOAT, (void *)pixel);
 
-				printf(">>>>>%d %d %d\n", pixel[0], pixel[1], pixel[2]);
+				printf(">>>>>%lf %lf %lf || Finding material\n", pixel[0], pixel[1], pixel[2]);
+				int resMaterial = findMaterial(pixel[0], pixel[1], pixel[2]);
+				printf("[MOUSE_PRESS]: resMaterial: %d\n", resMaterial);
+				if (resMaterial != -1) {
+					if (PAINT_ALL_FLAG) {
+						FOUND_OBJECT_PAINT_ALL = 0;
+						HAS_PAINT_ALL_OBJECT = 0;
+					}
+
+					CURR_MATERIAL = resMaterial;
+					//CHANGED_COLOR = 1;
+				}
+
+
 			}
 			else{
-				
+
 				mouseInitialPosition->x = x;
 				mouseInitialPosition->y = y;
 			}
@@ -1136,8 +1148,8 @@ void mouseMove(int x, int y){
 int main(int argc, char** argv)
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-
-	//mainMenu(1);
+	CURR_MATERIAL = 2;
+	mainMenu(1);
 	mainMenu(4);
 
 	glutCreateWindow("Hello World");
@@ -1168,4 +1180,3 @@ int main(int argc, char** argv)
 
 
 }
-
