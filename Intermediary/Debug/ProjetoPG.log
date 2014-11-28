@@ -1,4 +1,4 @@
-﻿Build started 27/11/2014 21:38:02.
+﻿Build started 27/11/2014 21:45:37.
      1>Project "C:\Users\tls\Desktop\td2\threedee\ProjetoPG.vcxproj" on node 2 (Build target(s)).
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(356,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(357,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
@@ -7,26 +7,26 @@
          ProjetoPG.cpp
      1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(20): warning C4005: '_CRT_SECURE_NO_WARNINGS' : macro redefinition
                  command-line arguments :  see previous definition of '_CRT_SECURE_NO_WARNINGS'
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(204): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(231): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(227): warning C4101: 'B' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(227): warning C4101: 'R' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(227): warning C4101: 'G' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(739): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(743): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(747): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(767): warning C4101: 'h' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(767): warning C4101: 'e2' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(767): warning C4101: 's' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(767): warning C4101: 'q' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(767): warning C4101: 'e1' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(811): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(828): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(869): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(827): warning C4101: 'ty' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(827): warning C4101: 'tz' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(827): warning C4101: 'tx' : unreferenced local variable
-     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(972): warning C4101: 'winZ' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(310): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(337): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(333): warning C4101: 'B' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(333): warning C4101: 'R' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(333): warning C4101: 'G' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(851): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(855): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(859): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(879): warning C4101: 'h' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(879): warning C4101: 'e2' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(879): warning C4101: 's' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(879): warning C4101: 'q' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(879): warning C4101: 'e1' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(923): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(940): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(981): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(939): warning C4101: 'ty' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(939): warning C4101: 'tz' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(939): warning C4101: 'tx' : unreferenced local variable
+     1>c:\users\tls\desktop\td2\threedee\projetopg.cpp(1084): warning C4101: 'winZ' : unreferenced local variable
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Output\Debug\ProjetoPG.exe" /INCREMENTAL /NOLOGO /LIBPATH:.\Dependencies\Lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:".\Output\Debug\ProjetoPG.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\Output\Debug\ProjetoPG.lib" /MACHINE:X86 .\Intermediary\Debug\Camera.obj
          .\Intermediary\Debug\Face.obj
@@ -41,4 +41,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:08.07
+Time Elapsed 00:00:01.46

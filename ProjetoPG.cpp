@@ -35,6 +35,8 @@ vector<vector<Point>> MEM_VEC_POINTS;
 vector<vector<Vector>> MEM_VEC_VECTOR;
 vector<vector<Face>> MEM_VEC_FACES;
 
+bool boundingBox = false;
+
 bool director = false;
 
 bool directorClicked = false;
@@ -98,6 +100,110 @@ GLfloat MATERIALS_DIFFUSE[7][3] = {
 		{ 0.8, 0.1, 0.35 },
 		{ 0.1, 0.5, 0.4 }
 };
+
+void drawBoundingBox(int gridL){
+
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(1, 0, 0);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, gridL, 0);
+		glVertex3f(0, i, 0);
+		glVertex3f(gridL, i, 0);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(0, i, 0);
+		glVertex3f(0, i, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(0, gridL, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef((gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(0, i, 0);
+		glVertex3f(0, i, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(0, gridL, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, (gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, gridL, 0);
+		glVertex3f(0, i, 0);
+		glVertex3f(gridL, i, 0);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), gridL, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, 0, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(gridL, 0, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+}
 
 void drawCoordinateSystem(){
 
@@ -363,7 +469,9 @@ void display(){
 
 	drawObjects();
 
-	//setLightning();
+	if (boundingBox)
+		drawBoundingBox(100);
+	
 	/* Coordinate system drawing */
 
 	drawCoordinateSystem();
@@ -617,6 +725,10 @@ void keyboard(unsigned char key, int x, int y){
 	case 'V':
 	case 'v':
 		director = !director;
+		break;
+	case 'G':
+	case 'g':
+		boundingBox = !boundingBox;
 		break;
 	case 'M':
 	case 'm':
@@ -1025,8 +1137,8 @@ int main(int argc, char** argv)
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
-	mainMenu(1);
-	//mainMenu(4);
+	//mainMenu(1);
+	mainMenu(4);
 
 	glutCreateWindow("Hello World");
 	glutInitWindowSize(800, 600);
