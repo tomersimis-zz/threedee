@@ -954,10 +954,10 @@ pair<Point, Point> fromScreenToWorld(int winX, int winY){
 	winY = viewport[3] - winY;
 	winZ = 0.1;
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &resX, &resY, &resZ);
-	printf("Resultado: %lf %lf %lf\n", resX, resY, resZ);
+	
 	winZ = 500;
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &res2X, &res2Y, &res2Z);
-	printf("Resultado: %lf %lf %lf\n", res2X, res2Y, res2Z);
+	
 	return (make_pair(Point(resX, resY, resZ), Point(res2X, res2Y, res2Z)));
 }
 
@@ -972,7 +972,7 @@ bool pointIn(pair<Point, Point> par, Face f){
 
 
 void paintFace(pair<Point, Point> par){
-	printf("Camera---> %lf %lf %lf\n", camera.position.x, camera.position.y, camera.position.z);
+	
 	Face f, fobj;
 	bool ok;
 	pair<int, int> index; // first == object, second == face;
@@ -1033,11 +1033,11 @@ void paintFace(pair<Point, Point> par){
 				Point centro = f.centroid();
 				double distCentroid = camera.position.distanceFrom(centro);
 				//double distCentroid = camera.position.distanceFrom( *(f.v1)  );
-				printf("Encontrou! Centroid: %lf %lf %lf   || Distance: %lf e minDist: %lf  \n", centro.x, centro.y, centro.z, distCentroid, minDist);
+				//printf("Encontrou! Centroid: %lf %lf %lf   || Distance: %lf e minDist: %lf  \n", centro.x, centro.y, centro.z, distCentroid, minDist);
 				if (distCentroid < minDist) {
 					minDist = distCentroid;
 					index.first = i, index.second = j;
-					printf("Melhor: (%d, %d) -- Dist: %lf\n", i, j, minDist);
+					//printf("Melhor: (%d, %d) -- Dist: %lf\n", i, j, minDist);
 				}
 			}
 		}
@@ -1051,7 +1051,7 @@ void paintFace(pair<Point, Point> par){
 		}
 		else { 
 			int i = index.first, j = index.second;
-			printf("Face index: %d %d\n", i, j);
+			//printf("Face index: %d %d\n", i, j);
 			objects[i].faces[j]->materialIndex = CURR_MATERIAL;
 
 		}
@@ -1087,7 +1087,7 @@ void mousePress(int btn, int state, int x, int y){
 		else{
 
 			if (!CLICKED){
-				printf("Em tela: %d %d\n", x, y);
+				//printf("Em tela: %d %d\n", x, y);
 				double winX = x, winY = y, winZ;
 				pair<Point, Point> par = fromScreenToWorld(x, y);
 				paintFace(par);
@@ -1117,9 +1117,9 @@ void mousePress(int btn, int state, int x, int y){
 				glReadPixels(x, viewport[3] - y, 1, 1,
 					GL_RGB, GL_FLOAT, (void *)pixel);
 
-				printf(">>>>>%lf %lf %lf || Finding material\n", pixel[0], pixel[1], pixel[2]);
+				//printf(">>>>>%lf %lf %lf || Finding material\n", pixel[0], pixel[1], pixel[2]);
 				int resMaterial = findMaterial(pixel[0], pixel[1], pixel[2]);
-				printf("[MOUSE_PRESS]: resMaterial: %d\n", resMaterial);
+				//printf("[MOUSE_PRESS]: resMaterial: %d\n", resMaterial);
 				if (resMaterial != -1) {
 					if (PAINT_ALL_FLAG) {
 						FOUND_OBJECT_PAINT_ALL = 0;
