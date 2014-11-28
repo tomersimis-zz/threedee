@@ -404,9 +404,8 @@ void display(){
 }
 
 void setLightning(){
-	//glPushMatrix();
-	//glLoadIdentity();
-	glEnable(GL_LIGHTING);
+	glLoadIdentity();
+	/*glEnable(GL_LIGHTING);*/
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
@@ -421,7 +420,6 @@ void setLightning(){
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position[1]);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
-	//glPopMatrix();
 }
 
 void reshape(int w, int h){
@@ -775,8 +773,8 @@ int rayIntersectsTriangle(Point p, Vector d,
 	if (V < 0.0 || U + V > 1.0) return 0;
 	// achando t 
 	double T = F * E2.dotProduct(Q);
-	if (T > 0.00001) return 1; // intereseÁ„o de raio
-	else return 0; // intereseÁ„o de linha mas n„o de raio
+	if (T > 0.00001) return 1; // interese√ß√£o de raio
+	else return 0; // interese√ß√£o de linha mas n√£o de raio
 }
 
 pair<Point, Point> fromScreenToWorld(int winX, int winY){
@@ -1041,6 +1039,8 @@ int main(int argc, char** argv)
 
 	mousePosition = new Point(0, 0, 0);
 	mouseInitialPosition = new Point(0, 0, 0);
+
+	glEnable(GL_LIGHTING);
 
 	camera = Camera(0, 0, 50);
 	camera2 = Camera(100, 100, 100);
