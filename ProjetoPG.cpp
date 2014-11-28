@@ -96,6 +96,7 @@ int light = 0;
 
 bool enable = false;
 
+// Initial near
 float near = 64;
 
 int selectedObject = 0;
@@ -439,14 +440,14 @@ void drawObjects(){
 	
 
 		int index, materialIndex;
-		//int contador = 0;
+		
 		for (int j = 0; j < objects[i].faces.size(); j++){
 
 			if (PAINT_ALL_FLAG && FOUND_OBJECT_PAINT_ALL && !HAS_PAINT_ALL_OBJECT && i == CURR_OBJECT_PAINT_ALL) {
 				objects[i].faces[j]->materialIndex = CURR_MATERIAL;
 			}
 
-
+			//draw faces
 			glBegin(GL_TRIANGLES);
 			materialIndex = objects[i].faces[j]->materialIndex;
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, MATERIALS_AMBIENT[materialIndex]);
@@ -455,16 +456,16 @@ void drawObjects(){
 
 #ifdef DRAW_NORMAL
 			index = objects[i].faces[j]->v1->index;
-			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z); // vertex normal
 			glVertex3d(objects[i].faces[j]->v1->x, objects[i].faces[j]->v1->y, objects[i].faces[j]->v1->z);
 #endif
 
 			index = objects[i].faces[j]->v2->index;
-			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z); // vertex normal
 			glVertex3d(objects[i].faces[j]->v2->x, objects[i].faces[j]->v2->y, objects[i].faces[j]->v2->z);
 
 			index = objects[i].faces[j]->v3->index;
-			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z);
+			glNormal3d(objects[i].normals[index]->x, objects[i].normals[index]->y, objects[i].normals[index]->z); // vertex normal
 			glVertex3d(objects[i].faces[j]->v3->x, objects[i].faces[j]->v3->y, objects[i].faces[j]->v3->z);
 
 			glEnd();
@@ -702,12 +703,12 @@ void keyboard(unsigned char key, int x, int y){
 	switch (key){
 
 	case '1':
-		if (mode == 0){
-			objects[selectedObject].translationX -= 0.1;
+		if (mode == 0){// move selected object
+			objects[selectedObject].translationX -= 0.1; 
 		}
-		else{
-			light_position[light][0] += 0.05;
-			if (light_position[light][0] > 1) light_position[light][0] = 1;
+		else{// move selected light
+			light_position[light][0] -= 0.05;
+			if (light_position[light][0] < -1) light_position[light][0] = -1;
 			if (light == 0){
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
 			}
@@ -717,12 +718,12 @@ void keyboard(unsigned char key, int x, int y){
 		}
 		break;
 	case '2':
-		if (mode == 0){
+		if (mode == 0){// move selected object
 			objects[selectedObject].translationX += 0.1;
 		}
-		else{
-			light_position[light][0] -= 0.05;
-			if (light_position[light][0] < -1) light_position[light][0] = -1;
+		else{// move selected light
+			light_position[light][0] += 0.05;
+			if (light_position[light][0] > 1) light_position[light][0] = 1;
 			if (light == 0){
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
 			}
@@ -733,12 +734,12 @@ void keyboard(unsigned char key, int x, int y){
 
 		break;
 	case '3':
-		if (mode == 0){
+		if (mode == 0){// move selected object
 			objects[selectedObject].translationY -= 0.1;
 		}
-		else{
-			light_position[light][1] += 0.05;
-			if (light_position[light][1] > 1) light_position[light][1] = 1;
+		else{// move selected light
+			light_position[light][1] -= 0.05;
+			if (light_position[light][1] < -1) light_position[light][1] = -1;
 			if (light == 0){
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
 			}
@@ -749,12 +750,12 @@ void keyboard(unsigned char key, int x, int y){
 
 		break;
 	case '4':
-		if (mode == 0){
+		if (mode == 0){// move selected object
 			objects[selectedObject].translationY += 0.1;
 		}
-		else{
-			light_position[light][1] -= 0.05;
-			if (light_position[light][1] < -1) light_position[light][1] = -1;
+		else{// move selected light
+			light_position[light][1] += 0.05;
+			if (light_position[light][1] > 1) light_position[light][1] = 1;
 			if (light == 0){
 				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
 			}
@@ -764,26 +765,10 @@ void keyboard(unsigned char key, int x, int y){
 		}
 		break;
 	case '5':
-		if (mode == 0){
+		if (mode == 0){// move selected object
 			objects[selectedObject].translationZ -= 0.1;
 		}
-		else{
-			light_position[light][2] += 0.05;
-			if (light_position[light][2] > 1) light_position[light][2] = 1;
-			if (light == 0){
-				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
-			}
-			else{
-				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
-			}
-		}
-
-		break;
-	case '6':
-		if (mode == 0){
-			objects[selectedObject].translationZ += 0.1;
-		}
-		else{
+		else{// move selected light
 			light_position[light][2] -= 0.05;
 			if (light_position[light][2] < -1) light_position[light][2] = -1;
 			if (light == 0){
@@ -795,18 +780,35 @@ void keyboard(unsigned char key, int x, int y){
 		}
 
 		break;
+	case '6':
+		if (mode == 0){// move selected object
+			objects[selectedObject].translationZ += 0.1;
+		}
+		else{// move selected light
+			light_position[light][2] += 0.05;
+			if (light_position[light][2] > 1) light_position[light][2] = 1;
+			if (light == 0){
+				glLightfv(GL_LIGHT0, GL_POSITION, light_position[light]);
+			}
+			else{
+				glLightfv(GL_LIGHT1, GL_POSITION, light_position[light]);
+			}
+		}
+
+		break;
 	case '7':
-		objects[selectedObject].rotationX += 0.1;
+		objects[selectedObject].rotationX += 0.1; //rotate selected object
 		break;
 	case '8':
-		objects[selectedObject].rotationY += 0.1;
+		objects[selectedObject].rotationY += 0.1;//rotate selected object
 		break;
 	case '9':
-		objects[selectedObject].rotationZ += 0.1;
+		objects[selectedObject].rotationZ += 0.1;//rotate selected object
 		break;
 	case 'w':
 	case 'W':
-		if (director && x > windowWidth / 2){
+		// move camera
+		if (director && x > windowWidth / 2){ 
 			camera2.slide(0, 0, -1);
 		}
 		else{
@@ -815,6 +817,7 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 's':
 	case 'S':
+		// move camera
 		if (director && x > windowWidth / 2){
 			camera2.slide(0, 0, 1);
 		}
@@ -824,6 +827,7 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'd':
 	case 'D':
+		// move camera
 		if (director && x > windowWidth / 2){
 			camera2.slide(1, 0, 0);
 		}
@@ -833,6 +837,7 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'a':
 	case 'A':
+		// move camera
 		if (director && x > windowWidth / 2){
 			camera2.slide(-1, 0, 0);
 		}
@@ -842,11 +847,11 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case '-':
 	case '_':
-		objects[selectedObject].scale -= 0.1;
+		objects[selectedObject].scale -= 0.1; // decrease select object scale
 		break;
 	case '=':
 	case '+':
-		objects[selectedObject].scale += 0.1;
+		objects[selectedObject].scale += 0.1;// increase select object scale
 		break;
 	case 'n':
 	case 'N':
@@ -890,11 +895,13 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'z':
 	case 'Z':
+		//backward dolly effect
 		camera.slide(0, 0, -0.0875);
 		near -= 0.0875;
 		break;
 	case 'x':
 	case 'X':
+		//foward dolly effect
 		camera.slide(0, 0, 0.0875);
 		near += 0.0875;
 		break;
