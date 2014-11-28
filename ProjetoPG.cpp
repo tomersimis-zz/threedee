@@ -349,6 +349,9 @@ void display(){
 
 	glMatrixMode(GL_MODELVIEW);
 
+	glLoadIdentity();
+	setLightning();
+
 	double m[16] = {
 		camera.getMatrix()[0], camera.getMatrix()[1], camera.getMatrix()[2], camera.getMatrix()[3],
 		camera.getMatrix()[4], camera.getMatrix()[5], camera.getMatrix()[6], camera.getMatrix()[7],
@@ -360,7 +363,7 @@ void display(){
 
 	drawObjects();
 
-	setLightning();
+	//setLightning();
 	/* Coordinate system drawing */
 
 	drawCoordinateSystem();
@@ -378,6 +381,9 @@ void display(){
 		glPointSize(1.0);
 
 		glMatrixMode(GL_MODELVIEW);
+
+		glLoadIdentity();
+		setLightning();
 
 		double m2[16] = {
 			camera2.getMatrix()[0], camera2.getMatrix()[1], camera2.getMatrix()[2], camera2.getMatrix()[3],
@@ -404,7 +410,7 @@ void display(){
 }
 
 void setLightning(){
-	glLoadIdentity();
+	//glLoadIdentity();
 	/*glEnable(GL_LIGHTING);*/
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LESS);
