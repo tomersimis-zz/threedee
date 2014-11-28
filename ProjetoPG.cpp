@@ -44,6 +44,7 @@ bool director = false;
 
 bool directorClicked = false;
 
+bool first = true;
 
 // COLOR PICKER 
 int CURR_OBJECT_PAINT_ALL;
@@ -63,10 +64,7 @@ GLfloat light_position[2][4] = { { 1, 1, 0, 0.0 }, { 1.0, 1.0, .5, 0.0 } };
 int light = 0;
 bool enable = false;
 
-float near = 0.1;
-
-
-
+float near = 64;
 
 int selectedObject = 0;
 
@@ -90,6 +88,7 @@ bool pointIn();
 void paintFace();
 void mousePress();
 void mouseMove();
+int cmpDouble(double a, double b);
 
 GLfloat MATERIALS_AMBIENT[12][3] = {
 	{ (double)229 / 255, (double)24 / 255, 0 },
@@ -123,6 +122,12 @@ GLfloat MATERIALS_DIFFUSE[12][3] = {
 
 void drawBoundingBox(int gridL){
 
+
+	glPushMatrix();
+
+	glColor3f(1, 0, 0);
+
+	glTranslatef(0, -(gridL / 2), 0);
 
 	glPushMatrix();
 
@@ -221,6 +226,8 @@ void drawBoundingBox(int gridL){
 	};
 
 	glEnd();
+
+	glPopMatrix();
 
 	glPopMatrix();
 }
@@ -350,17 +357,12 @@ void drawObjects(){
 		Transform::scale(objects[i].scale, scaleMatrix);
 		glMultMatrixd(scaleMatrix);
 
-		double R, G, B;
+	
 
 		int index, materialIndex;
 		//int contador = 0;
 		for (int j = 0; j < objects[i].faces.size(); j++){
-		/*	int CURR_OBJECT_PAINT_ALL;
-			int CURR_MATERIAL;
-			bool FOUND_OBJECT_PAINT_ALL;
-			bool HAS_PAINT_ALL_OBJECT;
-			bool PAINT_ALL_FLAG;
-		*/
+
 			if (PAINT_ALL_FLAG && FOUND_OBJECT_PAINT_ALL && !HAS_PAINT_ALL_OBJECT && i == CURR_OBJECT_PAINT_ALL) {
 				objects[i].faces[j]->materialIndex = CURR_MATERIAL;
 			}
@@ -389,15 +391,16 @@ void drawObjects(){
 			glEnd();
 		}
 
+		if (PAINT_ALL_FLAG && FOUND_OBJECT_PAINT_ALL && !HAS_PAINT_ALL_OBJECT &&  i == CURR_OBJECT_PAINT_ALL) {
+			HAS_PAINT_ALL_OBJECT = 1;
+		}
 
 		glPopMatrix();
 
 	}
 
 
-	if (PAINT_ALL_FLAG && FOUND_OBJECT_PAINT_ALL && !HAS_PAINT_ALL_OBJECT ) {
-		HAS_PAINT_ALL_OBJECT = 1;
-	}
+
 
 }
 
@@ -471,7 +474,19 @@ void display(){
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
+
+	if (cmpDouble(near, 64) ==0  ){
+		glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, 0.1, 500);
+	}
+	else{
+		if (first){
+			camera.slide(0, 0, 52);
+		}
+		first = false;
+		glFrustum(-32 * aspect, 32 * aspect, -32, 32, near, 1000);
+	}
+	
+	glPushMatrix();
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -498,7 +513,7 @@ void display(){
 	drawObjects();
 
 	if (boundingBox)
-		drawBoundingBox(100);
+		drawBoundingBox(64);
 
 	/* Coordinate system drawing */
 
@@ -509,8 +524,17 @@ void display(){
 	if (colorPicker)
 		drawColorPicker();
 
+	glPopMatrix();
+
 	if (director){
 		glViewport(glutGet(GLUT_WINDOW_WIDTH) / 2, 0, glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT));
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+
+		glPushMatrix();
+
+		gluPerspective(45, aspect, 0.1, 1000);
 
 		glColor3d(0.0, 0.0, 0.0);
 
@@ -572,21 +596,6 @@ void reshape(int w, int h){
 #ifdef DEBUG
 	printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
 #endif
-
-	float aspect;
-	if (director) {
-		aspect = (float)(w / 2) / (float)(h / 2);
-	}
-	else{
-		aspect = (float)w / (float)h;
-	}
-
-
-	glViewport(w / 2, 0, w / 2, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, near, 500);
-
 
 }
 
@@ -786,38 +795,13 @@ void keyboard(unsigned char key, int x, int y){
 		break;
 	case 'z':
 	case 'Z':
-		camera.slide(0, 0, -0.2);
-		//camera->z += cameraForward.z / 3;
-		//camera->x += cameraForward.x / 3;
-		//camera->y += cameraForward.y / 3;
-
-		//lookAt->z += cameraForward.z / 3;
-		//lookAt->x += cameraForward.x / 3;
-		//lookAt->y += cameraForward.y / 3;
-
-		near -= 0.0026;
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
+		camera.slide(0, 0, -0.0875);
+		near -= 0.0875;
 		break;
 	case 'x':
 	case 'X':
-		camera.slide(0, 0, 0.2);
-		//camera->z -= cameraForward.z / 3;
-		//camera->x -= cameraForward.x / 3;
-		//camera->y -= cameraForward.y / 3;
-
-		//lookAt->z -= cameraForward.z / 3;
-		//lookAt->x -= cameraForward.x / 3;
-		//lookAt->y -= cameraForward.y / 3;
-
-		near += 0.0026;
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glFrustum(-0.041421, 0.041421, -0.041421, 0.041421, near, 500);
-		break;
+		camera.slide(0, 0, 0.0875);
+		near += 0.0875;
 		break;
 	case 'p':
 	case 'P':
@@ -938,7 +922,7 @@ pair<Point, Point> fromScreenToWorld(int winX, int winY){
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	double resX, resY, resZ, res2X, res2Y, res2Z;
 	winY = viewport[3] - winY;
-	winZ = near;
+	winZ = 0.1;
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &resX, &resY, &resZ);
 	printf("Resultado: %lf %lf %lf\n", resX, resY, resZ);
 	winZ = 500;
@@ -960,7 +944,6 @@ bool pointIn(pair<Point, Point> par, Face f){
 void paintFace(pair<Point, Point> par){
 	printf("Camera---> %lf %lf %lf\n", camera.position.x, camera.position.y, camera.position.z);
 	Face f, fobj;
-	double R = 0.5, G = 0.5, B = 0.5;
 	bool ok;
 	pair<int, int> index; // first == object, second == face;
 	bool found = 0;
@@ -1040,9 +1023,7 @@ void paintFace(pair<Point, Point> par){
 			int i = index.first, j = index.second;
 			printf("Face index: %d %d\n", i, j);
 			objects[i].faces[j]->materialIndex = CURR_MATERIAL;
-			objects[i].faces[j]->R = R;
-			objects[i].faces[j]->G = G;
-			objects[i].faces[j]->B = B;
+
 		}
 
 	}
@@ -1149,11 +1130,11 @@ int main(int argc, char** argv)
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	CURR_MATERIAL = 2;
-	mainMenu(1);
+	//mainMenu(1);
 	mainMenu(4);
 
 	glutCreateWindow("Hello World");
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(1900, 600);
 
 	//glutFullScreen();
 
