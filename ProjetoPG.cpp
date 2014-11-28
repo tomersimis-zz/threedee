@@ -31,39 +31,69 @@
 #define SHOW_FPS
 
 
+// Vector to store all the objects
 std::vector<Object> objects;
 
+// Main camera
 Camera camera;
+
+// Director's vision camera
 Camera camera2;
 
+// Vectors used by the .OBJ loader to store the .obj primitives
 vector<vector<Point>> MEM_VEC_POINTS;
 vector<vector<Vector>> MEM_VEC_VECTOR;
 vector<vector<Face>> MEM_VEC_FACES;
 
+// Boolean that activates the bounding box (used for the dolly effect)
 bool boundingBox = false;
 
+// Boolean that activates the director's vision
 bool director = false;
 
+// Boolean to indicate wheter the user is moving the camera on the director's vision or not
 bool directorClicked = false;
 
+// Boolean used in the dolly effect to correct camera position
 bool first = true;
 
-// COLOR PICKER 
-int CURR_OBJECT_PAINT_ALL;
-int CURR_MATERIAL;
-bool FOUND_OBJECT_PAINT_ALL;
-bool HAS_PAINT_ALL_OBJECT;
-bool PAINT_ALL_FLAG;
+/* Color picker variables */
+// Boolean to indicate if the color picker is being shown
 bool colorPicker = false;
-bool picking = false;
-bool CHANGED_COLOR;
 
+// Boolean to indicate if the user is picking a color
+bool picking = false;
+
+// Boolean to indicate if we're painting only a face or the entire object
+bool PAINT_ALL_FLAG;
+
+int CURR_OBJECT_PAINT_ALL;
+
+// Int to indicate the index of the current material selected by the user
+int CURR_MATERIAL;
+
+bool FOUND_OBJECT_PAINT_ALL;
+
+bool HAS_PAINT_ALL_OBJECT;
+
+bool CHANGED_COLOR;
+/* End of color picker variables */
+
+// Boolean to indicate if the user is dragging or just clicking
 bool drag;
+
+// Point to represent the actual mouse position
 Point* mousePosition;
+
+// Point to represent the old mouse position (used to calculate mouse movement delta)
 Point* mouseInitialPosition;
 
+// Initial position of the lights
 GLfloat light_position[2][4] = { { 1, 1, 0, 0.0 }, { 1.0, 1.0, .5, 0.0 } };
+
+// Current selected light
 int light = 0;
+
 bool enable = false;
 
 float near = 64;
@@ -74,6 +104,10 @@ int NEXT_INDEX;
 
 int windowWidth;
 int windowHeight;
+
+bool CLICKED = 0;
+
+char mode = 0; // 0 = obj, 1 = light
 
 void setLightning();
 void drawCoordinateSystem();
@@ -148,6 +182,10 @@ GLfloat MATERIALS_DIFFUSE[12][3] = {
 	{ 1, 1, 1 },
 };
 
+/*
+* Method to draw a bounding box
+* gridL -> Number of lines
+*/
 void drawBoundingBox(int gridL){
 
 
@@ -260,6 +298,9 @@ void drawBoundingBox(int gridL){
 	glPopMatrix();
 }
 
+/*
+* Method to draw a coordinate system at the origin along all the axis
+*/
 void drawCoordinateSystem(){
 
 	glDisable(GL_LIGHTING);
@@ -287,6 +328,11 @@ void drawCoordinateSystem(){
 	glEnable(GL_LIGHTING);
 }
 
+/*
+* Method to draw a flat square of a single color
+* X, Y -> Position of the square (center)
+* R,G,B -> Color component of the square
+*/
 void drawSquare(int x, int y, int size, double r, double g, double b){
 	glBegin(GL_TRIANGLES);
 	glColor3f(r, g, b);
@@ -300,6 +346,9 @@ void drawSquare(int x, int y, int size, double r, double g, double b){
 	glEnd();
 }
 
+/*
+* Method to draw a simple color picker at the screen edge
+*/
 void drawColorPicker(){
 
 	glDisable(GL_LIGHTING);
@@ -360,7 +409,9 @@ void drawColorPicker(){
 	glEnable(GL_LIGHTING);
 }
 
-
+/*
+* Method to draw the objects of the scene and they transformations
+*/
 void drawObjects(){
 	for (int i = 0; i < objects.size(); i++){
 		glPushMatrix();
@@ -432,6 +483,9 @@ void drawObjects(){
 
 }
 
+/*
+* Method to draw a grid on the floor (xz axis)
+*/
 void drawGrid(){
 	glDisable(GL_LIGHTING);
 
@@ -459,6 +513,10 @@ void drawGrid(){
 
 }
 
+/*
+* Method to draw a camera (a box and a cylinder) used on the director's vision module
+* X, Y, Z -> Position of the camera
+*/
 void drawCamera(float x, float y, float z)
 {
 
@@ -488,10 +546,15 @@ void drawCamera(float x, float y, float z)
 	glPopMatrix();
 }
 
+/*
+* Display function
+*/
 void display(){
-#ifdef SHOW_FPS
-	calculateFPS();
-#endif 
+	#ifdef SHOW_FPS
+		calculateFPS();
+	#endif 
+
+	// Calculating aspect (w/h)
 	float aspect;
 	if (director){
 		aspect = (float)(windowWidth / 2) / (float)(windowHeight);
@@ -505,10 +568,10 @@ void display(){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	if (cmpDouble(near, 64) ==0  ){
+	if (cmpDouble(near, 64) == 0 ){ // Normal mode
 		glFrustum(-0.041421*aspect, 0.041421*aspect, -0.041421, 0.041421, 0.1, 500);
 	}
-	else{
+	else{ // Dolly effect mode
 		if (first){
 			camera.slide(0, 0, 52);
 		}
@@ -545,8 +608,6 @@ void display(){
 	if (boundingBox)
 		drawBoundingBox(64);
 
-	/* Coordinate system drawing */
-
 	drawCoordinateSystem();
 
 	drawGrid();
@@ -556,7 +617,7 @@ void display(){
 
 	glPopMatrix();
 
-	if (director){
+	if (director){ // If director vision is enable, draw another viewport and replicate the objects
 		glViewport(glutGet(GLUT_WINDOW_WIDTH) / 2, 0, glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT));
 
 		glMatrixMode(GL_PROJECTION);
@@ -599,9 +660,10 @@ void display(){
 
 }
 
+/*
+* Method to set the global lightning
+*/
 void setLightning(){
-	//glLoadIdentity();
-	/*glEnable(GL_LIGHTING);*/
 	glClearDepth(1.0f);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
@@ -618,20 +680,23 @@ void setLightning(){
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
 }
 
+/*
+* Reshape method, set the new width and height to a global variable
+*/
 void reshape(int w, int h){
 
 	windowWidth = w;
 	windowHeight = h;
 
-#ifdef DEBUG
-	printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
-#endif
+	#ifdef DEBUG
+		printf("[DEBUG] Reshaping window, new size: %d x %d\n", w, h);
+	#endif
 
 }
 
-
-
-char mode = 0; // 0 = obj, 1 = light
+/*
+* Keyboard callback method
+*/
 void keyboard(unsigned char key, int x, int y){
 
 	switch (key){
@@ -908,8 +973,6 @@ void mainMenu(int item){
 	}
 
 
-
-
 	printf("Criando o novo objeto . . ./n");
 	Object newObject = Object(vertex, faces, normals);
 	newObject.calculateNormals();
@@ -1061,13 +1124,17 @@ void paintFace(pair<Point, Point> par){
 
 }
 
-bool CLICKED = 0;
-
+/*
+* Method to compare two doubles, avoiding floating point precision issues
+*/
 int cmpDouble(double a, double b){
 	if (fabs(a - b) <= EPS_CMP_DOUBLE) return 0;
 	return  (a > b) ? 1 : -1;
 }
 
+/*
+* Method to find the material corresponding to a color from the pallete
+*/
 int findMaterial(double r, double g, double b){
 	for (int i = 0; i < MATERIALS_NUMBER; i ++){
 		if (cmpDouble(r, MATERIALS_AMBIENT[i][0]) == 0 && cmpDouble(g, MATERIALS_AMBIENT[i][1]) == 0 && cmpDouble(b, MATERIALS_AMBIENT[i][2]) == 0 ) {
@@ -1077,6 +1144,9 @@ int findMaterial(double r, double g, double b){
 	return -1;
 }
 
+/*
+* Mouse callback
+*/
 void mousePress(int btn, int state, int x, int y){
 	if (btn == GLUT_LEFT_BUTTON){
 
@@ -1166,7 +1236,7 @@ int main(int argc, char** argv)
 	glutCreateWindow("Hello World");
 	glutInitWindowSize(1900, 600);
 
-	//glutFullScreen();
+	glutFullScreen();
 
 	glutDisplayFunc(display);
 
