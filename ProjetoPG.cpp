@@ -28,6 +28,8 @@
 #define EPS 1e-9
 #define EPS_CMP_DOUBLE 1e-5
 
+#define SHOW_FPS
+
 
 std::vector<Object> objects;
 
@@ -89,6 +91,32 @@ void paintFace();
 void mousePress();
 void mouseMove();
 int cmpDouble(double a, double b);
+
+// FPS VARS
+int frameCount = 0;
+float FPS = 0;
+double currentTime = 0, previousTime = 0;
+
+
+void calculateFPS(){
+	currentTime = glutGet(GLUT_ELAPSED_TIME);
+	double timeInterval = currentTime - previousTime;
+	frameCount++;
+	if (timeInterval >= 1000){
+		FPS = frameCount* 1000.0f / (timeInterval);
+		printf("[FPS]:%lf\n", FPS);
+		//  Set time
+		previousTime = currentTime;
+
+
+
+
+
+
+		//  Reset frame count
+		frameCount = 0;
+	}
+}
 
 GLfloat MATERIALS_AMBIENT[12][3] = {
 	{ (double)229 / 255, (double)24 / 255, 0 },
@@ -461,7 +489,9 @@ void drawCamera(float x, float y, float z)
 }
 
 void display(){
-
+#ifdef SHOW_FPS
+	calculateFPS();
+#endif 
 	float aspect;
 	if (director){
 		aspect = (float)(windowWidth / 2) / (float)(windowHeight);
